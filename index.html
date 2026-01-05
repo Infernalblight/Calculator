@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muscle, Coin & Bloodline Calculators</title>
+<style>
+:root{
+  --bg:#0b0f1a;
+  --card:#12172a;
+  --accent:#7c9cff;
+  --accent2:#5bffb0;
+  --text:#e8ebff;
+  --muted:#9aa2ff;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{
+  margin:0;
+  min-height:100vh;
+  background:radial-gradient(1200px 600px at top,#121a3a,var(--bg));
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.container{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:20px;
+  width:1500px;
+  max-width:98vw;
+}
+.card{
+  background:linear-gradient(180deg,#141a33,var(--card));
+  padding:24px;
+  border-radius:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+h2{margin:0 0 14px;font-size:20px}
+label{display:block;margin-top:12px;font-size:13px;color:var(--muted)}
+input,select{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:#0d1226;
+  color:var(--text);
+}
+.options{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.option{
+  flex:1;
+  background:#0d1226;
+  padding:10px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+button{
+  width:100%;
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-weight:700;
+  cursor:pointer;
+}
+.results{
+  margin-top:16px;
+  background:#0d1226;
+  padding:12px;
+  border-radius:12px;
+  font-size:13px;
+  line-height:1.6;
+}
+table{
+  width:100%;
+  margin-top:14px;
+  border-collapse:collapse;
+  font-size:12px;
+}
+th,td{
+  padding:6px;
+  border-bottom:1px solid #1e2550;
+  text-align:right;
+}
+th{text-align:left;color:var(--muted)}
+.value{color:var(--accent2);font-weight:700}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="card">
+<h2>Muscle Gain Timeline</h2>
+<label>Muscles per lift</label>
+<input id="mpl">
+<label>Muscles you already have</label>
+<input id="musclesHave">
+<label>Clicks per second</label>
+<input id="cps1">
+<div class="options">
+  <label class="option"><input id="fast1" type="checkbox">Fast Lifter</label>
+</div>
+<button onclick="calcTimeline()">Calculate</button>
+<table id="timeline"></table>
+</div>
+
+<div class="card">
+<h2>Coin Target Calculator</h2>
+<label>Coins needed</label>
+<input id="coinsNeeded">
+<label>Coins you have</label>
+<input id="coinsHave">
+<label>Muscles per lift</label>
+<input id="mpl2">
+<label>Muscles you already have</label>
+<input id="musclesHave2">
+<label>Clicks per second</label>
+<input id="cps2">
+<div class="options">
+  <label class="option"><input id="doubleCoins" type="checkbox">2× Coins</label>
+  <label class="option"><input id="fast2" type="checkbox">Fast Lifter</label>
+</div>
+<button onclick="calcCoins()">Calculate</button>
+<div class="results" id="coinResults"></div>
+</div>
+
+<div class="card">
+<h2>Bloodline Calculator</h2>
+<label>Bloodline per minion</label>
+<input id="bloodPerKill">
+<label>Minions killed at once</label>
+<select id="minionsAtOnce">
+  <option value="1">1</option>
+  <option value="2">2</option>
+</select>
+<label>Kill time (seconds)</label>
+<input id="killTime" value="10.2">
+<label>Bloodline needed</label>
+<input id="bloodNeeded">
+<button onclick="calcBloodline()">Calculate</button>
+<div class="results" id="bloodResults"></div>
+</div>
+
+</div>
+
+<script>
+const API_URL = "https://heating-tee-opposite-before.trycloudflare.com"
+
+function formatVal(v){
+  const units=["","K","M","B","T","QA","QI","SX","SP","OC","NO","DC"]
+  let i=0
+  while(v>=1000&&i<units.length-1){v/=1000;i++}
+  return v.toFixed(3)+" "+units[i]
+}
+
+function renderTimeline(perSec,have){
+  timeline.innerHTML="<tr><th>Time</th><th>Total Muscles</th></tr>"
+  const add=(l,s)=>timeline.innerHTML+=`<tr><th>${l}</th><td class="value">${formatVal(have+perSec*s)}</td></tr>`
+  for(let m=1;m<=59;m++)add(m+" min",m*60)
+  for(let h=1;h<=23;h++)add(h+" hour",h*3600)
+  for(let d=1;d<=6;d++)add(d+" day",d*86400)
+}
+
+async function calcTimeline(){
+  const r=await fetch(API_URL+"/calc/muscle",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      mpl:mpl.value,
+      have:musclesHave.value,
+      cps:cps1.value,
+      fast:fast1.checked
+    })
+  })
+  const d=await r.json()
+  const have=Number(musclesHave.value)||0
+  renderTimeline(d.perSecond,have)
+}
+
+async function calcCoins(){
+  const r=await fetch(API_URL+"/calc/coins",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      need:coinsNeeded.value,
+      haveCoins:coinsHave.value,
+      mpl:mpl2.value,
+      haveMuscles:musclesHave2.value,
+      cps:cps2.value,
+      doubleCoins:doubleCoins.checked,
+      fast:fast2.checked
+    })
+  })
+  const d=await r.json()
+  coinResults.innerHTML=`
+Time needed: <span class="value">${d.exact}</span><br>
+Days: <span class="value">${d.days.toFixed(2)}</span><br>
+Hours: <span class="value">${d.hours.toFixed(2)}</span><br>
+Minutes: <span class="value">${d.minutes.toFixed(2)}</span><br>
+Seconds: <span class="value">${d.seconds.toFixed(2)}</span>
+`
+}
+
+async function calcBloodline(){
+  const r=await fetch(API_URL+"/calc/bloodline",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      perKill:bloodPerKill.value,
+      count:minionsAtOnce.value,
+      killTime:killTime.value,
+      need:bloodNeeded.value
+    })
+  })
+  const d=await r.json()
+  bloodResults.innerHTML=`
+Bloodline per minute: <span class="value">${formatVal(d.perMinute)}</span><br>
+Exact time: <span class="value">${d.exact}</span><br>
+Days: <span class="value">${d.days.toFixed(2)}</span><br>
+Hours: <span class="value">${d.hours.toFixed(2)}</span><br>
+Minutes: <span class="value">${d.minutes.toFixed(2)}</span><br>
+Seconds: <span class="value">${d.seconds.toFixed(2)}</span>
+`
+}
+</script>
+</body>
+</html>
