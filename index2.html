@@ -1,195 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lifting Simulator Calculator</title>
+
 <style>
-body { font-family: Arial, sans-serif; margin: 20px; background:#f0f0f0; }
-input, select { padding: 5px; margin: 5px; width: 200px; }
-button { padding: 10px; margin: 10px 0; }
-#result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 0 5px #aaa; }
+body{
+  font-family: system-ui, Arial, sans-serif;
+  background:#0b0f1a;
+  color:#e8ebff;
+  margin:0;
+  padding:30px;
+}
+.card{
+  max-width:900px;
+  margin:auto;
+  background:#12172a;
+  padding:24px;
+  border-radius:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+h1{margin-top:0}
+input,select,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0 14px 0;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  font-size:15px;
+}
+input,select{background:#0b0f1a;color:#e8ebff}
+button{
+  background:#7c9cff;
+  color:#0b0f1a;
+  font-weight:700;
+  cursor:pointer;
+}
+button:hover{opacity:.85}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{font-size:14px;opacity:.85}
+#result{
+  margin-top:18px;
+  background:#0b0f1a;
+  padding:18px;
+  border-radius:14px;
+  line-height:1.55;
+}
+.small{opacity:.75;font-size:13px}
+.checks label{display:block}
 </style>
 </head>
+
 <body>
+<div class="card">
 <h1>Lifting Simulator Calculator</h1>
-<label for="weightSelect">Select Weight:</label>
-<select id="weightSelect"></select><br>
-<label for="stageSelect">Select Stage:</label>
-<select id="stageSelect"></select><br>
-<label><input type="checkbox" id="doubleMuscles"> 2× Muscles</label><br>
-<label><input type="checkbox" id="fasterLifter"> Faster Lifter</label><br>
-<label><input type="checkbox" id="doubleCoins"> 2× Coins (not used in muscle calc)</label><br>
-<label for="ownedMuscles">Already Have Muscles:</label>
-<input type="text" id="ownedMuscles" placeholder="e.g. 2.5Qi" /><br>
-<label for="ownedCoins">Already Have Coins:</label>
-<input type="text" id="ownedCoins" placeholder="e.g. 1T" /><br>
+
+<div class="row">
+<div>
+<label>Weight</label>
+<select id="weightSelect"></select>
+</div>
+<div>
+<label>Stage</label>
+<select id="stageSelect"></select>
+</div>
+</div>
+
+<div class="checks">
+<label><input type="checkbox" id="doubleMuscles"> 2× Muscles</label>
+<label><input type="checkbox" id="fasterLifter"> Faster Lifter</label>
+<label><input type="checkbox" id="doubleCoins"> 2× Coins</label>
+</div>
+
+<div class="row">
+<div>
+<label>Already Have Muscles</label>
+<input id="ownedMuscles" placeholder="e.g. 2.5Qi">
+</div>
+<div>
+<label>Already Have Coins</label>
+<input id="ownedCoins" placeholder="e.g. 1T">
+</div>
+</div>
+
 <button id="calculateBtn">Calculate</button>
 <div id="result"></div>
-<script>
-const weightsURL = 'https://liftingsimulatorcalculator.netlify.app/weights.json';
-const stagesURL = 'https://liftingsimulatorcalculator.netlify.app/stages.json';
+</div>
 
-let weights = [], stages = [];
+<script>
+const weightsURL = "https://liftingsimulatorcalculator.netlify.app/weights.json"
+const stagesURL  = "https://liftingsimulatorcalculator.netlify.app/stages.json"
+
+let weights=[], stages=[]
 
 const suffixes = [
-  ["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],
-  ["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],
-  ["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],
-  ["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120],["Ag",123],
-  ["Uag",126],["Dag",129],["Tag",132],["Qaag",135],["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],["Dcag",153],
-  ["Udag",156],["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],
-  ["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],["Dqig",213],
-  ["Tqig",216],["QaQig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],["Udqig",240],["Ddqig",243],
-  ["Tdqig",246],["Sxg",249],["Usxg",252],["Dxsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],["Sxsxg",267],["Spsxg",270],["Ocsxg",273],
-  ["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
-];
+["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],
+["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],
+["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],
+["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120],["Ag",123],
+["Uag",126],["Dag",129],["Tag",132],["Qaag",135],["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],["Dcag",153],
+["Udag",156],["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],
+["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],["Dqig",213],
+["Tqig",216],["QaQig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],["Udqig",240],["Ddqig",243],
+["Tdqig",246],["Sxg",249],["Usxg",252],["Dxsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],["Sxsxg",267],["Spsxg",270],["Ocsxg",273],
+["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
+]
 
-async function loadData() {
-  try {
-    const weightsResponse = await fetch(weightsURL);
-    const stagesResponse = await fetch(stagesURL);
-    if (!weightsResponse.ok || !stagesResponse.ok) throw new Error('Network response was not ok');
-    weights = await weightsResponse.json();
-    stages = await stagesResponse.json();
-    stages.forEach(stage => {
-      stage.gainValue = parseGain(stage.gain);
-    });
-    populateSelects();
-  } catch (error) {
-    console.error('Error loading JSON data:', error);
+async function loadData(){
+  const [w,s]=await Promise.all([fetch(weightsURL),fetch(stagesURL)])
+  weights=await w.json()
+  stages=await s.json()
+  populate()
+}
+
+function populate(){
+  weightSelect.innerHTML=""
+  stageSelect.innerHTML=""
+
+  stages.sort((a,b)=>a.n-b.n)
+  weights.sort((a,b)=>a.cost-b.cost)
+
+  for(const st of stages){
+    const o=document.createElement("option")
+    o.value=st.n
+    o.text=`Stage ${st.n}`
+    stageSelect.appendChild(o)
+  }
+
+  for(const w of weights){
+    const o=document.createElement("option")
+    o.value=w.name
+    o.text=`${w.name} | Cost ${formatNum(w.cost)} | Gain ${w.gain}`
+    weightSelect.appendChild(o)
   }
 }
 
-function parseGain(str) {
-  const match = str.match(/^x([\d.]+)([A-Za-z]+)?$/);
-  if (!match) return 1;
-  const numberPart = parseFloat(match[1]);
-  const suffixPart = match[2];
-  if (!suffixPart) return numberPart;
-  const scale = getScale(suffixPart);
-  return numberPart * scale;
-}
-
-function getScale(suffix) {
-  for (let [sfx, scale] of suffixes) {
-    if (sfx.toLowerCase() === suffix.toLowerCase()) return Math.pow(10, scale);
+function parseNum(str){
+  if(!str)return 0
+  str=str.replace(/,/g,"").trim()
+  for(const [s,p] of suffixes){
+    if(str.toUpperCase().endsWith(s.toUpperCase()))
+      return parseFloat(str)*10**p
   }
-  return 1;
+  return parseFloat(str)||0
 }
 
-function populateSelects() {
-  const wSelect = document.getElementById('weightSelect');
-  wSelect.innerHTML = '';
-
-  const stageSet = new Set(weights.map(w => w.stage));
-  stageSet.forEach(stg => {
-    const stageWeights = weights.filter(w => w.stage === stg);
-    stageWeights.forEach(w => {
-      let o = document.createElement('option');
-      o.value = w.name;
-      o.text = `${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${w.gain}) [Stage ${stg}]`;
-      wSelect.appendChild(o);
-    });
-  });
-
-  const sSelect = document.getElementById('stageSelect');
-  sSelect.innerHTML = '';
-  stages.forEach(s => {
-    let o = document.createElement('option');
-    o.value = s.n;
-    o.text = `Stage ${s.n} (x${formatNum(s.gainMultiplier)})`;
-    sSelect.appendChild(o);
-  });
-}
-
-function parseInput(str) {
-  str = str.replace(/,/g, '').trim().toUpperCase();
-  for (let [s, p] of suffixes) {
-    if (str.endsWith(s.toUpperCase())) return parseFloat(str.slice(0, -s.length)) * Math.pow(10, p);
+function formatNum(n){
+  if(!isFinite(n))return "∞"
+  for(let i=suffixes.length-1;i>=0;i--){
+    if(n>=10**suffixes[i][1])
+      return (n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
   }
-  return parseFloat(str) || 0;
+  if(n>=1e3)return (n/1e3).toFixed(2)+"K"
+  return n.toFixed(2)
 }
 
-function formatNum(num) {
-  if (num == null || isNaN(num)) return "N/A";
-  for (let i = suffixes.length - 1; i >= 0; i--) {
-    if (num >= Math.pow(10, suffixes[i][1])) 
-      return (num / Math.pow(10, suffixes[i][1])).toFixed(2) + suffixes[i][0];
-  }
-  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
-  return num.toFixed(2);
+function humanTime(sec){
+  if(!isFinite(sec))return "∞"
+  if(sec<60)return sec.toFixed(2)+"s"
+  sec/=60
+  if(sec<60)return sec.toFixed(2)+"m"
+  sec/=60
+  if(sec<24)return sec.toFixed(2)+"h"
+  sec/=24
+  if(sec<365)return sec.toFixed(2)+"d"
+  return (sec/365).toFixed(2)+"y"
 }
 
-function humanTime(sec) {
-  if (!isFinite(sec)) return "∞";
-  if (sec < 60) return sec.toFixed(2) + " seconds";
-  let m = sec / 60;
-  if (m < 60) return m.toFixed(2) + " minutes";
-  let h = m / 60;
-  if (h < 24) return h.toFixed(2) + " hours";
-  let d = h / 24;
-  if (d < 365) return d.toFixed(2) + " days";
-  let y = d / 365;
-  if (y < 1000) return y.toFixed(2) + " years";
-  return (y / 1000).toFixed(2) + "k years";
+function calculate(){
+  const weight=weights.find(w=>w.name===weightSelect.value)
+  const stage=stages.find(s=>s.n==stageSelect.value)
+
+  const ownedMuscles=parseNum(ownedMusclesInput.value)
+  const ownedCoins=parseNum(ownedCoinsInput.value)
+
+  let gain=parseNum(weight.gain)
+  gain*=stage.gainMultiplier
+
+  if(doubleMuscles.checked)gain*=2
+
+  let perSecond=gain*stage.m
+  if(fasterLifter.checked)perSecond*=2
+
+  let coinsPerSecond=perSecond
+  if(doubleCoins.checked)coinsPerSecond*=2
+
+  const nextWeight=weights.find(w=>w.cost>ownedCoins)
+  const nextStage=stages.find(s=>s.n>stage.n)
+
+  const timeToWeight=nextWeight?(nextWeight.cost-ownedCoins)/coinsPerSecond:Infinity
+  const timeToStage=nextStage?((weights.filter(w=>w.stage==nextStage.n)[0]?.cost||Infinity)-ownedCoins)/coinsPerSecond:Infinity
+
+  result.innerHTML=`
+<b>Muscles per lift:</b> ${formatNum(gain)}<br>
+<b>Muscles per second:</b> ${formatNum(perSecond)}<br><br>
+
+<b>Coins per second:</b> ${formatNum(coinsPerSecond)}<br>
+<b>Time to next weight:</b> ${humanTime(timeToWeight)}<br>
+<b>Time to next stage:</b> ${humanTime(timeToStage)}<br><br>
+
+<span class="small">
+Stage multiplier: x${stage.gainMultiplier}<br>
+Lifts/sec: ${stage.m}
+</span>
+`
 }
 
-function calculate() {
-  const weightName = document.getElementById('weightSelect').value;
-  const stageNum = parseInt(document.getElementById('stageSelect').value);
-  const doubleMuscles = document.getElementById('doubleMuscles').checked;
-  const faster = document.getElementById('fasterLifter').checked;
-  const doubleCoins = document.getElementById('doubleCoins').checked;
-  const ownedMuscles = parseInput(document.getElementById('ownedMuscles').value || '0');
-  const ownedCoins = parseInput(document.getElementById('ownedCoins').value || '0');
+const ownedMusclesInput=document.getElementById("ownedMuscles")
+const ownedCoinsInput=document.getElementById("ownedCoins")
 
-  const stage = stages.find(s => s.n === stageNum);
-  if (!stage) {
-    document.getElementById('result').innerHTML = 'Stage not found.';
-    return;
-  }
-
-  const stageWeights = weights.filter(w => w.stage === stage.n);
-  const weight = stageWeights.find(w => w.name === weightName);
-  if (!weight) {
-    document.getElementById('result').innerHTML = 'Weight not found.';
-    return;
-  }
-
-  const gainVal = stage.gainValue;
-  let musclesPerLift = gainVal;
-  if (doubleMuscles) musclesPerLift *= 2;
-  let musclesPerSec = musclesPerLift * stage.m;
-  if (faster) musclesPerSec *= 2;
-
-  const nextWeight = stageWeights.find(w => w.cost > ownedCoins);
-  const timeToNextWeight = nextWeight ? (nextWeight.cost - ownedCoins) / musclesPerSec : Infinity;
-
-  const nextStage = stages.find(s => s.n > stage.n);
-  let totalNextStageCost = Infinity;
-  if (nextStage) {
-    const nextStageWeights = weights.filter(w => w.stage === nextStage.n);
-    if (nextStageWeights.length > 0) totalNextStageCost = nextStageWeights[0].cost;
-  }
-  const timeToNextStage = totalNextStageCost / musclesPerSec;
-
-  document.getElementById('result').innerHTML = `
-<b>Stage Multiplier:</b> x${formatNum(stage.gainMultiplier)}<br>
-<b>Weight:</b> ${weightName}<br>
-<b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
-<b>Gain per Lift:</b> ${gainVal.toFixed(2)} (from ${weight.gain})<br>
-<b>Muscles/sec:</b> ${formatNum(musclesPerSec)}<br>
-<b>Time to next Weight:</b> ${humanTime(timeToNextWeight)}<br>
-<b>Time to next Stage:</b> ${humanTime(timeToNextStage)}<br>
-<b>2× Muscles:</b> ${doubleMuscles ? "Yes" : "No"}<br>
-<b>Faster Lifter:</b> ${faster ? "Yes" : "No"}<br>
-<b>2× Coins Flag:</b> ${doubleCoins ? "Yes" : "No"} (not used in muscle calc)
-`;
-}
-
-document.getElementById('calculateBtn').addEventListener('click', calculate);
-loadData();
+calculateBtn.onclick=calculate
+loadData()
 </script>
 </body>
 </html>
