@@ -80,7 +80,7 @@ function populateSelects() {
   sSelect.innerHTML = '';
   stages.forEach(s => {
     let o = document.createElement('option');
-    o.value = s.n;
+    o.value = s.n; // Make sure value is the stage number
     o.text = `Stage ${s.n} (x${formatNum(s.m)})`;
     sSelect.appendChild(o);
   });
@@ -128,11 +128,17 @@ function calculate() {
   const ownedCoins = parseInput(document.getElementById('ownedCoins').value || '0');
 
   const stage = stages.find(s => s.n === stageNum);
-  if (!stage) return;
+  if (!stage) {
+    document.getElementById('result').innerHTML = 'Stage not found.';
+    return;
+  }
 
   const stageWeights = weights.filter(w => w.stage === stage.n);
   const weight = stageWeights.find(w => w.name === weightName);
-  if (!weight) return;
+  if (!weight) {
+    document.getElementById('result').innerHTML = 'Weight not found.';
+    return;
+  }
 
   const gainStr = weight.gain;
 
