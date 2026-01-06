@@ -2,102 +2,152 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lifting Simulator Calculator</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; background:#f4f4f4;}
-  input, select { padding: 5px; margin: 5px; width: 200px; }
-  button { padding: 5px 10px; margin: 5px; }
-  .result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; }
+body { font-family: Arial, sans-serif; margin: 20px; background:#f0f0f0; }
+input, select { padding: 5px; margin: 5px; width: 200px; }
+button { padding: 10px; margin: 10px 0; }
+#result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 0 5px #aaa; }
 </style>
 </head>
 <body>
 
 <h1>Lifting Simulator Calculator</h1>
 
-<div>
-  <label>Current Muscles:</label>
-  <input type="text" id="musclesInput" placeholder="e.g., 1T">
-  <label>Current Coins:</label>
-  <input type="text" id="coinsInput" placeholder="e.g., 500B">
-  <button id="calcBtn">Calculate</button>
-</div>
+<label for="weightSelect">Select Weight:</label>
+<select id="weightSelect"></select><br>
 
-<div class="result" id="result"></div>
+<label for="stageSelect">Select Stage:</label>
+<select id="stageSelect"></select><br>
+
+<label><input type="checkbox" id="doubleMuscles"> 2× Muscles</label><br>
+<label><input type="checkbox" id="fasterLifter"> Faster Lifter</label><br>
+<label><input type="checkbox" id="doubleCoins"> 2× Coins (not used in muscle calc)</label><br>
+
+<label for="ownedMuscles">Already Have Muscles:</label>
+<input type="text" id="ownedMuscles" placeholder="e.g. 2.5Qi"><br>
+<label for="ownedCoins">Already Have Coins:</label>
+<input type="text" id="ownedCoins" placeholder="e.g. 1T"><br>
+
+<button id="calculateBtn">Calculate</button>
+
+<div id="result"></div>
 
 <script>
 const weightsURL = 'https://liftingsimulatorcalculator.netlify.app/weights.json';
 const stagesURL = 'https://liftingsimulatorcalculator.netlify.app/stages.json';
 
-const shortcuts = [
-  ["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],
-  ["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],["Td",42],["Qad",45],
-  ["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],
-  ["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],
-  ["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],
-  ["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120],["Ag",123],["Uag",126],["Dag",129],
-  ["Tag",132],["Qaag",135],["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],
-  ["Dcag",153],["Udag",156],["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],
-  ["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],["Spqag",186],["Ocqag",189],
-  ["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],
-  ["Dqig",213],["Tqig",216],["Qaqig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],
-  ["Noqig",234],["Dcqig",237],["Udqig",240],["Ddqig",243],["Tdqig",246],["Sxg",249],["Usxg",252],
-  ["Dsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],["Sxsxg",267],["Spsxg",270],["Ocsxg",273],
-  ["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],["Uspg",294],
-  ["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
+let weights = [], stages = [];
+const suffixes = [
+["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],
+["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],
+["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],
+["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120],["Ag",123],["Uag",126],["Dag",129],
+["Tag",132],["Qaag",135],["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],["Dcag",153],["Udag",156],
+["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],
+["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],
+["Dqig",213],["Tqig",216],["QaQig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],
+["Udqig",240],["Ddqig",243],["Tdqig",246],["Sxg",249],["Usxg",252],["Dsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],
+["Sxsxg",267],["Spsxg",270],["Ocsxg",273],["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],
+["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
 ];
 
-function parseNumber(str) {
-  str = str.trim();
-  if (/^\d+(\.\d+)?$/.test(str)) return Number(str);
-  for (const [suffix, power] of shortcuts) {
-    if (str.endsWith(suffix)) return parseFloat(str) * 10**power;
-  }
-  return 0;
+async function loadData() {
+  weights = await fetch(weightsURL).then(r=>r.json());
+  stages = await fetch(stagesURL).then(r=>r.json());
+
+  const wSelect = document.getElementById('weightSelect');
+  weights.forEach(w=>{
+    let o=document.createElement('option');
+    o.value=w.name;
+    o.text=`${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${formatNum(w.gain)})`;
+    wSelect.appendChild(o);
+  });
+
+  const sSelect = document.getElementById('stageSelect');
+  stages.forEach(s=>{
+    let o=document.createElement('option');
+    o.value=s.n;
+    o.text=`Stage ${s.n} x${formatNum(s.m)}`;
+    sSelect.appendChild(o);
+  });
 }
 
-function formatNumber(num) {
-  for (let i = shortcuts.length - 1; i >= 0; i--) {
-    const [suffix, power] = shortcuts[i];
-    if (num >= 10**power) return (num/10**power).toFixed(2) + suffix;
+function parseInput(str) {
+  str = str.replace(/,/g,'').trim().toUpperCase();
+  for(let [s,p] of suffixes){
+    if(str.endsWith(s)) return parseFloat(str.slice(0,-s.length))*Math.pow(10,p);
   }
+  return parseFloat(str) || 0;
+}
+
+function formatNum(num){
+  for(let i=suffixes.length-1;i>=0;i--){
+    if(num>=Math.pow(10,suffixes[i][1])) return (num/Math.pow(10,suffixes[i][1])).toFixed(2)+suffixes[i][0];
+  }
+  if(num>=1e3) return (num/1e3).toFixed(2)+'K';
   return num.toFixed(2);
 }
 
-async function getData(url) {
-  const res = await fetch(url);
-  return await res.json();
+function humanTime(sec){
+  if(!isFinite(sec)) return "∞";
+  if(sec<60) return sec.toFixed(2)+" seconds";
+  let m=sec/60;if(m<60)return m.toFixed(2)+" minutes";
+  let h=m/60;if(h<24)return h.toFixed(2)+" hours";
+  let d=h/24;if(d<365)return d.toFixed(2)+" days";
+  let y=d/365;if(y<1000)return y.toFixed(2)+" years";
+  return (y/1000).toFixed(2)+"k years";
 }
 
-document.getElementById('calcBtn').addEventListener('click', async () => {
-  const musclesHave = parseNumber(document.getElementById('musclesInput').value);
-  const coinsHave = parseNumber(document.getElementById('coinsInput').value);
-  
-  const weights = await getData(weightsURL);
-  const stages = await getData(stagesURL);
+function calculate(){
+  const weightName = document.getElementById('weightSelect').value;
+  const stageNum = parseInt(document.getElementById('stageSelect').value);
+  const doubleMuscles = document.getElementById('doubleMuscles').checked;
+  const faster = document.getElementById('fasterLifter').checked;
+  const doubleCoins = document.getElementById('doubleCoins').checked;
+  const ownedMuscles = parseInput(document.getElementById('ownedMuscles').value||'0');
+  const ownedCoins = parseInput(document.getElementById('ownedCoins').value||'0');
 
-  let nextWeight = weights.find(w => w.cost > coinsHave) || weights[weights.length-1];
-  let nextStage = stages.find(s => s.m > musclesHave) || stages[stages.length-1];
+  const weight = weights.find(w=>w.name===weightName);
+  const stage = stages.find(s=>s.n===stageNum);
 
-  let stageMultiplier = nextStage.m / 1;
-  
-  const musclesPerSec = nextWeight.gain * nextStage.speed * stageMultiplier;
+  let musclesPerLift = weight.gain;
+  if(doubleMuscles) musclesPerLift *= 2;
 
-  const timeToNextWeight = (nextWeight.cost - coinsHave)/musclesPerSec;
-  const timeToNextStage = (nextStage.m - musclesHave)/musclesPerSec;
+  let musclesPerSec = musclesPerLift * stage.speed;
+  if(faster) musclesPerSec *= 2;
 
-  document.getElementById('result').innerHTML = `
-    <b>Stage Multiplier:</b> x${formatNumber(stageMultiplier)}<br>
-    <b>Weight:</b> ${nextWeight.name}<br>
-    <b>Weight Cost:</b> ${formatNumber(nextWeight.cost)}<br>
-    <b>Gain per Lift:</b> ${formatNumber(nextWeight.gain)}<br>
-    <b>Muscles/sec:</b> ${formatNumber(musclesPerSec)}<br>
-    <b>Time to next Weight:</b> ${timeToNextWeight > 0 ? (timeToNextWeight/60).toFixed(2) + " minutes" : "0"}<br>
-    <b>Time to next Stage:</b> ${timeToNextStage > 0 ? (timeToNextStage/60).toFixed(2) + " minutes" : "0"}<br>
-    <b>2× Muscles:</b> Yes<br>
-    <b>Faster Lifter:</b> Yes<br>
-    <b>2× Coins Flag:</b> Yes (not used in muscle calc)
+  // Time to next weight
+  let stageWeights = weights.filter(w=>w.stage===weight.stage);
+  let nextWeight = stageWeights.find(w=>w.cost>ownedCoins);
+  let timeToNextWeight = nextWeight ? (nextWeight.cost-ownedCoins)/musclesPerSec : Infinity;
+
+  // Time to next stage
+  let nextStage = stages.find(s=>s.n>stage.n);
+  let nextStageCost = nextStage ? nextStage.m : Infinity;
+  let totalNextStageCost = Infinity;
+  if(nextStage){
+    const nextStageWeights = weights.filter(w=>w.stage===nextStage.n);
+    if(nextStageWeights.length>0) totalNextStageCost = nextStageWeights[0].cost-ownedCoins;
+  }
+  let timeToNextStage = totalNextStageCost/musclesPerSec;
+
+  document.getElementById('result').innerHTML=`<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
+<b>Weight:</b> ${weight.name}<br>
+<b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
+<b>Gain per Lift:</b> ${formatNum(weight.gain)}<br>
+<b>Muscles/sec:</b> ${formatNum(musclesPerSec)}<br>
+<b>Time to next Weight:</b> ${humanTime(timeToNextWeight)}<br>
+<b>Time to next Stage:</b> ${humanTime(timeToNextStage)}<br>
+<b>2× Muscles:</b> ${doubleMuscles?"Yes":"No"}<br>
+<b>Faster Lifter:</b> ${faster?"Yes":"No"}<br>
+<b>2× Coins Flag:</b> ${doubleCoins?"Yes":"No"} (not used in muscle calc)
   `;
-});
+}
+
+document.getElementById('calculateBtn').addEventListener('click',calculate);
+loadData();
 </script>
 </body>
 </html>
