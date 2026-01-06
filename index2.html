@@ -226,24 +226,20 @@ function parseNum(str){
   if(str==null)return 0
   if(typeof str==="number")return str
   str=str.replace(/,/g,"").trim()
-  for(const[s,p]of suffixes)
-    if(str.toUpperCase().endsWith(s.toUpperCase()))
-      return parseFloat(str)*10**p
+  for(const[s,p]of suffixes)if(str.toUpperCase().endsWith(s.toUpperCase()))return parseFloat(str)*10**p
   return parseFloat(str)||0
 }
 
 function formatNum(n){
   n=parseNum(n)
   if(!isFinite(n))return "∞"
-  for(let i=suffixes.length-1;i>=0;i--)
-    if(n>=10**suffixes[i][1])
-      return (n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
-  if(n>=1e3)return (n/1e3).toFixed(2)+"K"
+  for(let i=suffixes.length-1;i>=0;i--)if(n>=10**suffixes[i][1])return(n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
+  if(n>=1e3)return(n/1e3).toFixed(2)+"K"
   return n.toFixed(2)
 }
 
 function humanTime(sec){
-  if(!isFinite(sec)||sec<0)return "∞"
+  if(!isFinite(sec)||sec<=0)return "0s"
   if(sec<60)return sec.toFixed(2)+"s"
   sec/=60;if(sec<60)return sec.toFixed(2)+"m"
   sec/=60;if(sec<24)return sec.toFixed(2)+"h"
@@ -286,32 +282,33 @@ function calculate(){
   let musclesPerLift=parseNum(weight.gain)*parseNum(stage.gainMultiplier)
   if(doubleMuscles.checked)musclesPerLift*=2
 
-  let baseCPS=1
-  let liftsPerSecond=baseCPS
+  let liftsPerSecond=1
   if(fasterLifter.checked)liftsPerSecond*=1.866
   liftsPerSecond*=stage.m
 
   let musclesPerSecond=musclesPerLift*liftsPerSecond
   let coinsPerSecond=doubleCoins.checked?musclesPerSecond*2:musclesPerSecond
 
-  const nextWeight=weights.find(w=>parseNum(w.cost)>ownedCoins)
+  let effectiveCoins=ownedCoins+(doubleCoins.checked?ownedMuscles*2:ownedMuscles)
+
+  const nextWeight=weights.find(w=>parseNum(w.cost)>effectiveCoins)
   const nextStage=stages.find(s=>s.n>stage.n)
   const nextStageFirstWeight=nextStage?weights.find(w=>w.stage==nextStage.n):null
 
-  const timeToWeight=nextWeight?(parseNum(nextWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
-  const timeToStage=nextStageFirstWeight?(parseNum(nextStageFirstWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
+  const needWeight=nextWeight?Math.max(0,parseNum(nextWeight.cost)-effectiveCoins):0
+  const needStage=nextStageFirstWeight?Math.max(0,parseNum(nextStageFirstWeight.cost)-effectiveCoins):0
+
+  const timeToWeight=needWeight>0?needWeight/coinsPerSecond:0
+  const timeToStage=needStage>0?needStage/coinsPerSecond:0
 
   result.innerHTML=`
 Muscles per lift: <span class="value">${formatNum(musclesPerLift)}</span><br>
 Muscles per second: <span class="value">${formatNum(musclesPerSecond)}</span><br><br>
-
 Coins per second: <span class="value">${formatNum(coinsPerSecond)}</span><br>
 Time to next weight: <span class="value">${humanTime(timeToWeight)}</span><br>
 Time to next stage: <span class="value">${humanTime(timeToStage)}</span><br><br>
-
 Already have muscles: <span class="value">${formatNum(ownedMuscles)}</span><br>
 Already have coins: <span class="value">${formatNum(ownedCoins)}</span><br><br>
-
 Stage multiplier: <span class="value">x${stage.gainMultiplier}</span><br>
 Lifts/sec: <span class="value">${liftsPerSecond.toFixed(3)}</span>
 `
