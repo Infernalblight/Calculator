@@ -1,250 +1,32 @@
 [
-  {
-    "n": 0,
-    "gain": "x1",
-    "hp_gain": "x1",
-    "dmg_gain": "x1",
-    "speed_gain": "x1",
-    "cost": 0
-  },
-  {
-    "n": 1,
-    "gain": "x2",
-    "hp_gain": "x2",
-    "dmg_gain": "x2",
-    "speed_gain": "x1",
-    "cost": 2000000
-  },
-  {
-    "n": 2,
-    "gain": "x5",
-    "hp_gain": "x5",
-    "dmg_gain": "x5",
-    "speed_gain": "x3",
-    "cost": 150000000
-  },
-  {
-    "n": 3,
-    "gain": "x19",
-    "hp_gain": "x19",
-    "dmg_gain": "x19",
-    "speed_gain": "x5",
-    "cost": 5000000000
-  },
-  {
-    "n": 4,
-    "gain": "x99",
-    "hp_gain": "x99",
-    "dmg_gain": "x99",
-    "speed_gain": "x7",
-    "cost": 125000000000
-  },
-  {
-    "n": 5,
-    "gain": "x499",
-    "hp_gain": "x499",
-    "dmg_gain": "x499",
-    "speed_gain": "x10",
-    "cost": 4300000000000
-  },
-  {
-    "n": 6,
-    "gain": "x2999",
-    "hp_gain": "x2999",
-    "dmg_gain": "x2999",
-    "speed_gain": "x13",
-    "cost": 160000000000000
-  },
-  {
-    "n": 7,
-    "gain": "x19K",
-    "hp_gain": "x19K",
-    "dmg_gain": "x19K",
-    "speed_gain": "x15",
-    "cost": 5400000000000000
-  },
-  {
-    "n": 8,
-    "gain": "x159K",
-    "hp_gain": "x159K",
-    "dmg_gain": "x159K",
-    "speed_gain": "x17",
-    "cost": 630000000000000000
-  },
-  {
-    "n": 9,
-    "gain": "x1.99M",
-    "hp_gain": "x1.99M",
-    "dmg_gain": "x1.99M",
-    "speed_gain": "x19",
-    "cost": 25000000000000000
-  },
-  {
-    "n": 10,
-    "gain": "x29.9M",
-    "hp_gain": "x29.9M",
-    "dmg_gain": "x29.9M",
-    "speed_gain": "x22",
-    "cost": 370000000000000000
-  },
-  {
-    "n": 11,
-    "gain": "x599M",
-    "hp_gain": "x599M",
-    "dmg_gain": "x599M",
-    "speed_gain": "x25",
-    "cost": 900000000000000000
-  },
-  {
-    "n": 12,
-    "gain": "x14.9B",
-    "hp_gain": "x14.9B",
-    "dmg_gain": "x14.9B",
-    "speed_gain": "x29",
-    "cost": 28800000000000000000
-  },
-  {
-    "n": 13,
-    "gain": "x449B",
-    "hp_gain": "x449B",
-    "dmg_gain": "x449B",
-    "speed_gain": "x34",
-    "cost": 124900000000000000000
-  },
-  {
-    "n": 14,
-    "gain": "x15.9T",
-    "hp_gain": "x15.9T",
-    "dmg_gain": "x15.9T",
-    "speed_gain": "x39",
-    "cost": 60900000000000000000
-  },
-  {
-    "n": 15,
-    "gain": "x629T",
-    "hp_gain": "x629T",
-    "dmg_gain": "x629T",
-    "speed_gain": "x44",
-    "cost": 344000000000000000000
-  },
-  {
-    "n": 16,
-    "gain": "x28.9Qa",
-    "hp_gain": "x28.9Qa",
-    "dmg_gain": "x28.9Qa",
-    "speed_gain": "x49",
-    "cost": 277000000000000000000
-  },
-  {
-    "n": 17,
-    "gain": "x1.49Qi",
-    "hp_gain": "x1.49Qi",
-    "dmg_gain": "x1.49Qi",
-    "speed_gain": "x54",
-    "cost": 2440000000000000000000
-  },
-  {
-    "n": 18,
-    "gain": "x77.9Qi",
-    "hp_gain": "x77.9Qi",
-    "dmg_gain": "x77.9Qi",
-    "speed_gain": "x59",
-    "cost": 2549000000000000000000
-  },
-  {
-    "n": 19,
-    "gain": "x5.555Sx",
-    "hp_gain": "x5.555Sx",
-    "dmg_gain": "x5.555Sx",
-    "speed_gain": "x66",
-    "cost": 2990000000000000000000
-  },
-  {
-    "n": 20,
-    "gain": "x279Sx",
-    "hp_gain": "x279Sx",
-    "dmg_gain": "x279Sx",
-    "speed_gain": "x70",
-    "cost": 16900000000000000000000
-  },
-  {
-    "n": 21,
-    "gain": "x13.9Sp",
-    "hp_gain": "x13.9Sp",
-    "dmg_gain": "x13.9Sp",
-    "speed_gain": "x76",
-    "cost": 13300000000000000000000
-  },
-  {
-    "n": 22,
-    "gain": "x699Sp",
-    "hp_gain": "x699Sp",
-    "dmg_gain": "x699Sp",
-    "speed_gain": "x82",
-    "cost": 9990000000000000000000
-  },
-  {
-    "n": 23,
-    "gain": "x34.9Oc",
-    "hp_gain": "x34.9Oc",
-    "dmg_gain": "x34.9Oc",
-    "speed_gain": "x88",
-    "cost": 8990000000000000000
-  },
-  {
-    "n": 24,
-    "gain": "x1.99No",
-    "hp_gain": "x1.99No",
-    "dmg_gain": "x1.99No",
-    "speed_gain": "x94",
-    "cost": 5990000000000000
-  },
-  {
-    "n": 25,
-    "gain": "x99.9No",
-    "hp_gain": "x99.9No",
-    "dmg_gain": "x99.9No",
-    "speed_gain": "x99",
-    "cost": 5550000000000000
-  },
-  {
-    "n": 26,
-    "gain": "x55.55Dc",
-    "hp_gain": "x55.55Dc",
-    "dmg_gain": "x55.55Dc",
-    "speed_gain": "x149",
-    "cost": 122000000000000000000
-  },
-  {
-    "n": 27,
-    "gain": "x299Ud",
-    "hp_gain": "x299Ud",
-    "dmg_gain": "x299Ud",
-    "speed_gain": "x199",
-    "cost": 345000000000000000000
-  },
-  {
-    "n": 28,
-    "gain": "x19.9Td",
-    "hp_gain": "x19.9Td",
-    "dmg_gain": "x19.9Td",
-    "speed_gain": "x299",
-    "cost": 75500000000000000000
-  },
-  {
-    "n": 29,
-    "gain": "x9.99Qid",
-    "hp_gain": "x9.99Qid",
-    "dmg_gain": "x9.99Qid",
-    "speed_gain": "x399",
-    "cost": 1990000000000000000
-  },
-  {
-    "n": 30,
-    "gain": "x55.55Spd",
-    "hp_gain": "x55.55Spd",
-    "dmg_gain": "x55.55Spd",
-    "speed_gain": "x499",
-    "cost": 5550000000000000000
-  }
+  {"n":1,"gainMultiplier":2,"m":1,"cost":"2M"},
+  {"n":2,"gainMultiplier":5,"m":3,"cost":"150M"},
+  {"n":3,"gainMultiplier":19,"m":5,"cost":"5B"},
+  {"n":4,"gainMultiplier":99,"m":7,"cost":"125B"},
+  {"n":5,"gainMultiplier":499,"m":10,"cost":"4.3T"},
+  {"n":6,"gainMultiplier":2999,"m":13,"cost":"160T"},
+  {"n":7,"gainMultiplier":19000,"m":15,"cost":"5.4Qa"},
+  {"n":8,"gainMultiplier":159000,"m":17,"cost":"630Qa"},
+  {"n":9,"gainMultiplier":1990000,"m":19,"cost":"25Qi"},
+  {"n":10,"gainMultiplier":29900000,"m":22,"cost":"370Qi"},
+  {"n":11,"gainMultiplier":599000000,"m":25,"cost":"90Sx"},
+  {"n":12,"gainMultiplier":14900000000,"m":29,"cost":"28.8Sp"},
+  {"n":13,"gainMultiplier":449000000000,"m":34,"cost":"12.49Oc"},
+  {"n":14,"gainMultiplier":15900000000000,"m":39,"cost":"6.09No"},
+  {"n":15,"gainMultiplier":629000000000000,"m":44,"cost":"3.44Dc"},
+  {"n":16,"gainMultiplier":"28.9Qa","m":49,"cost":"2.77Ud"},
+  {"n":17,"gainMultiplier":"1.49Qi","m":54,"cost":"2.44Dd"},
+  {"n":18,"gainMultiplier":"77.9Qi","m":59,"cost":"2.549Td"},
+  {"n":19,"gainMultiplier":"5.555Sx","m":66,"cost":"2.99Qad"},
+  {"n":20,"gainMultiplier":"279Sx","m":70,"cost":"16.9Qid"},
+  {"n":21,"gainMultiplier":"13.9Sp","m":76,"cost":"13.3Sxd"},
+  {"n":22,"gainMultiplier":"699Sp","m":82,"cost":"9.99Spd"},
+  {"n":23,"gainMultiplier":"34.9Oc","m":88,"cost":"8.99Ocd"},
+  {"n":24,"gainMultiplier":"1.99No","m":94,"cost":"5.99Nod"},
+  {"n":25,"gainMultiplier":"99.9No","m":99,"cost":"5.55Vg"},
+  {"n":26,"gainMultiplier":"55.55Dc","m":149,"cost":"12.2Uvg"},
+  {"n":27,"gainMultiplier":"299Ud","m":199,"cost":"345Tvg"},
+  {"n":28,"gainMultiplier":"19.9Td","m":299,"cost":"75.5Sxvg"},
+  {"n":29,"gainMultiplier":"9.99Qid","m":399,"cost":"199Novg"},
+  {"n":30,"gainMultiplier":"55.55Spd","m":499,"cost":"5.55Ttg"}
 ]
