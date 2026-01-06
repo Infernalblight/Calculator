@@ -82,7 +82,6 @@ function populateSelects() {
   const wSelect = document.getElementById('weightSelect');
   wSelect.innerHTML = '';
 
-  // Group weights by stage for easy selection
   const stageSet = new Set(weights.map(w => w.stage));
   stageSet.forEach(stg => {
     const stageWeights = weights.filter(w => w.stage === stg);
@@ -98,7 +97,7 @@ function populateSelects() {
   sSelect.innerHTML = '';
   stages.forEach(s => {
     let o = document.createElement('option');
-    o.value = s.n; // stage number as number
+    o.value = s.n;
     o.text = `Stage ${s.n} (x${formatNum(s.gainMultiplier)})`;
     sSelect.appendChild(o);
   });
@@ -158,8 +157,7 @@ function calculate() {
     return;
   }
 
-  const gainVal = stage.gainValue; // numeric gain
-
+  const gainVal = stage.gainValue;
   let musclesPerLift = gainVal;
   if (doubleMuscles) musclesPerLift *= 2;
   let musclesPerSec = musclesPerLift * stage.m;
