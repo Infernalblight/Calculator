@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stage & Weight Calculator</title>
-
 <style>
 :root{
   --yellow1:#f7c400;
@@ -168,9 +167,6 @@ button{
       <label>Search weight</label>
       <input id="weightSearch" placeholder="Type your weight name...">
 
-      <label>Clicks per second</label>
-      <input id="cps" placeholder="e.g. 1">
-
       <div class="options">
         <label class="option"><input id="gpMuscle" type="checkbox"> 2× Muscles</label>
         <label class="option"><input id="gpCoins" type="checkbox"> 2× Coins</label>
@@ -194,13 +190,14 @@ let weights = [];
 
 async function loadData() {
   try {
-    const stagesRes = await fetch("stages.json");
-    const weightsRes = await fetch("weights.json");
+    const stagesRes = await fetch("/stages.json");
+    const weightsRes = await fetch("/weights.json");
     stages = await stagesRes.json();
     weights = await weightsRes.json();
     populateStages();
   } catch(e) {
     console.error("Error loading JSON:", e);
+    document.getElementById("resultBox").textContent = "Failed to load JSON data.";
   }
 }
 
@@ -214,38 +211,47 @@ function populateStages() {
   });
 }
 
+function parseCost(cost) {
+  if(typeof cost === "number") return cost;
+  const suffixes = {K:1e3,M:1e6,B:1e9,T:1e12,Qa:1e15,Qi:1e18,Sx:1e21,Sp:1e24,Oc:1e27,No:1e30,Dc:1e33,Ud:1e36,Dd:1e39,Td:1e42,Qad:1e45,Qid:1e48,Sxd:1e51,Spd:1e54,Ocd:1e57,Nod:1e60,Vg:1e63,Uvg:1e66,Tvg:1e69,Sxvg:1e72,Novg:1e75,Ttg:1e78};
+  const match = cost.match(/^([\d.]+)([a-zA-Z]+)$/);
+  if(!match) return Number(cost);
+  const [,num,suf] = match;
+  return parseFloat(num) * (suffixes[suf] || 1);
+}
+
 function calculate() {
   const stageIndex = Number(document.getElementById("stageSelect").value);
-  const stage = stages.find(s => s.n === stageIndex);
-  const cpsInput = Number(document.getElementById("cps").value) || 0;
+  const stage = stages.find(s=>s.n===stageIndex);
   const weightName = document.getElementById("weightSearch").value.toLowerCase();
   const gpMuscle = document.getElementById("gpMuscle").checked;
+  const gpCoins = document.getElementById("gpCoins").checked;
   const fast = document.getElementById("fast").checked;
   const resultBox = document.getElementById("resultBox");
 
-  const weight = weights.find(w => w.stage === stage.n && w.name.toLowerCase().includes(weightName));
+  const weight = weights.find(w=>w.stage===stage.n && w.name.toLowerCase().includes(weightName));
   if(!weight) return resultBox.textContent = "Weight not found in this stage.";
 
-  let gain = weight.gain;
+  let gain = weight.gain * stage.m;
   if(gpMuscle) gain *= 2;
 
-  let cps = cpsInput;
+  let cps = 1;
   if(fast) cps *= 1.866;
 
-  const perSecond = gain * cps;
-  
-  const seconds = weight.cost / perSecond;
+  const musclesPerSecond = gain * cps;
+
+  const costNum = parseCost(weight.cost);
+  const seconds = costNum / musclesPerSecond;
 
   resultBox.innerHTML = `
-Stage: x${stage.m}<br>
+Stage multiplier: x${stage.m}<br>
 Weight: ${weight.name}<br>
-Weight cost: ${weight.cost.toLocaleString()} muscles<br>
-Muscles per second: ${perSecond.toLocaleString()}<br>
-Time needed: ${(seconds/60).toFixed(2)} minutes
+Weight cost: ${weight.cost}<br>
+Muscles per second: ${musclesPerSecond.toLocaleString()}<br>
+Time to reach: ${(seconds/60).toFixed(2)} minutes
   `;
 }
 
-// Load JSON when page loads
 loadData();
 </script>
 
