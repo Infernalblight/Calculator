@@ -11,12 +11,8 @@
   --yellow2:#e0a800;
   --panel:#b88900;
   --panel2:#d6a600;
-  --slot:#ffd84a;
-  --slot-dark:#e6b800;
   --green:#00e676;
   --green-dark:#00b85c;
-  --blue:#4fc3ff;
-  --text:#ffffff;
   --shadow:rgba(0,0,0,.35);
 }
 
@@ -51,7 +47,6 @@ body{
   align-items:center;
   padding:12px 8px;
   gap:12px;
-  box-shadow:inset 0 -6px 0 rgba(0,0,0,.2);
 }
 
 .side-btn{
@@ -65,7 +60,6 @@ body{
   font-size:28px;
   font-weight:900;
   color:#3b66ff;
-  box-shadow:0 6px 0 rgba(0,0,0,.25);
 }
 
 .content{
@@ -75,7 +69,6 @@ body{
   display:grid;
   grid-template-rows:auto 1fr;
   gap:12px;
-  box-shadow:inset 0 -6px 0 rgba(0,0,0,.18);
 }
 
 .topbar{
@@ -84,8 +77,6 @@ body{
   padding:10px 16px;
   display:flex;
   align-items:center;
-  gap:12px;
-  box-shadow:0 6px 0 rgba(0,0,0,.25);
 }
 
 .title{
@@ -94,8 +85,6 @@ body{
   font-size:34px;
   font-weight:900;
   color:#3b66ff;
-  letter-spacing:1px;
-  text-shadow:0 2px 0 rgba(0,0,0,.25);
 }
 
 .cards{
@@ -111,7 +100,6 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
-  box-shadow:0 10px 30px var(--shadow), inset 0 -5px 0 rgba(0,0,0,.2);
 }
 
 .card-title{
@@ -122,15 +110,9 @@ body{
   font-size:22px;
   font-weight:900;
   color:#3b66ff;
-  text-shadow:0 2px 0 rgba(0,0,0,.25);
 }
 
-label{
-  font-weight:800;
-  color:white;
-  text-shadow:0 1px 0 rgba(0,0,0,.25);
-  font-size:14px;
-}
+label{font-weight:800;color:white;font-size:14px}
 
 input,select{
   width:100%;
@@ -141,14 +123,9 @@ input,select{
   font-weight:900;
   font-size:15px;
   outline:none;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
-.options{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+.options{display:flex;gap:8px;flex-wrap:wrap}
 
 .option{
   flex:1;
@@ -160,7 +137,6 @@ input,select{
   gap:6px;
   font-weight:900;
   color:#2b2b2b;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
 button{
@@ -172,7 +148,6 @@ button{
   font-weight:900;
   color:white;
   background:linear-gradient(180deg,var(--green),var(--green-dark));
-  box-shadow:0 6px 0 rgba(0,0,0,.3);
   cursor:pointer;
 }
 
@@ -183,15 +158,9 @@ button{
   font-weight:900;
   color:#2b2b2b;
   line-height:1.6;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
 .value{color:#00a84a}
-
-@media (max-width:1000px){
-  .cards{grid-template-columns:1fr}
-  .main{grid-template-columns:70px 1fr}
-}
 </style>
 </head>
 <body>
@@ -249,31 +218,32 @@ button{
 const weightsURL="weights.json"
 const stagesURL="stages.json"
 
-const ownedCoinsInput=document.getElementById("ownedCoins")
-const ownedMusclesInput=document.getElementById("ownedMuscles")
+const suffixes=[["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120]]
 
 let weights=[],stages=[]
-
-const suffixes=[["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120]]
 
 function parseNum(str){
   if(str==null)return 0
   if(typeof str==="number")return str
   str=str.replace(/,/g,"").trim()
-  for(const[s,p]of suffixes)if(str.toUpperCase().endsWith(s.toUpperCase()))return parseFloat(str)*10**p
+  for(const[s,p]of suffixes)
+    if(str.toUpperCase().endsWith(s.toUpperCase()))
+      return parseFloat(str)*10**p
   return parseFloat(str)||0
 }
 
 function formatNum(n){
   n=parseNum(n)
   if(!isFinite(n))return "∞"
-  for(let i=suffixes.length-1;i>=0;i--)if(n>=10**suffixes[i][1])return(n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
-  if(n>=1e3)return(n/1e3).toFixed(2)+"K"
+  for(let i=suffixes.length-1;i>=0;i--)
+    if(n>=10**suffixes[i][1])
+      return (n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
+  if(n>=1e3)return (n/1e3).toFixed(2)+"K"
   return n.toFixed(2)
 }
 
 function humanTime(sec){
-  if(!isFinite(sec))return"∞"
+  if(!isFinite(sec)||sec<0)return "∞"
   if(sec<60)return sec.toFixed(2)+"s"
   sec/=60;if(sec<60)return sec.toFixed(2)+"m"
   sec/=60;if(sec<24)return sec.toFixed(2)+"h"
@@ -307,37 +277,47 @@ function populate(){
 }
 
 function calculate(){
+  const ownedCoins=parseNum(document.getElementById("ownedCoins").value)
+  const ownedMuscles=parseNum(document.getElementById("ownedMuscles").value)
+
   const weight=weights.find(w=>w.name===weightSelect.value)
   const stage=stages.find(s=>s.n==stageSelect.value)
-  const ownedCoins=parseNum(ownedCoinsInput.value)
 
-  let gain=parseNum(weight.gain)*parseNum(stage.gainMultiplier)
-  if(doubleMuscles.checked)gain*=2
+  let musclesPerLift=parseNum(weight.gain)*parseNum(stage.gainMultiplier)
+  if(doubleMuscles.checked)musclesPerLift*=2
 
-  let liftsPerSec=stage.m
-  if(fasterLifter.checked)liftsPerSec*=1.866
+  let baseCPS=1
+  let liftsPerSecond=baseCPS
+  if(fasterLifter.checked)liftsPerSecond*=1.866
+  liftsPerSecond*=stage.m
 
-  let perSecond=gain*liftsPerSec
-  let coinsPerSecond=doubleCoins.checked?perSecond*2:perSecond
+  let musclesPerSecond=musclesPerLift*liftsPerSecond
+  let coinsPerSecond=doubleCoins.checked?musclesPerSecond*2:musclesPerSecond
 
   const nextWeight=weights.find(w=>parseNum(w.cost)>ownedCoins)
   const nextStage=stages.find(s=>s.n>stage.n)
+  const nextStageFirstWeight=nextStage?weights.find(w=>w.stage==nextStage.n):null
 
   const timeToWeight=nextWeight?(parseNum(nextWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
-  const timeToStage=nextStage?((parseNum(weights.filter(w=>w.stage==nextStage.n)[0]?.cost)||Infinity)-ownedCoins)/coinsPerSecond:Infinity
+  const timeToStage=nextStageFirstWeight?(parseNum(nextStageFirstWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
 
   result.innerHTML=`
-Muscles per lift: <span class="value">${formatNum(gain)}</span><br>
-Muscles per second: <span class="value">${formatNum(perSecond)}</span><br><br>
+Muscles per lift: <span class="value">${formatNum(musclesPerLift)}</span><br>
+Muscles per second: <span class="value">${formatNum(musclesPerSecond)}</span><br><br>
+
 Coins per second: <span class="value">${formatNum(coinsPerSecond)}</span><br>
 Time to next weight: <span class="value">${humanTime(timeToWeight)}</span><br>
 Time to next stage: <span class="value">${humanTime(timeToStage)}</span><br><br>
+
+Already have muscles: <span class="value">${formatNum(ownedMuscles)}</span><br>
+Already have coins: <span class="value">${formatNum(ownedCoins)}</span><br><br>
+
 Stage multiplier: <span class="value">x${stage.gainMultiplier}</span><br>
-Lifts/sec: <span class="value">${liftsPerSec.toFixed(3)}</span>
+Lifts/sec: <span class="value">${liftsPerSecond.toFixed(3)}</span>
 `
 }
 
-calculateBtn.onclick=calculate
+document.getElementById("calculateBtn").onclick=calculate
 loadData()
 </script>
 
