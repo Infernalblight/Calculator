@@ -40,7 +40,7 @@ const suffixes = [
 ["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],
 ["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],
 ["Dqig",213],["Tqig",216],["QaQig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],
-["Udqig",240],["Ddqig",243],["Tdqig",246],["Sxg",249],["Usxg",252],["Dsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],
+["Udqig",240],["Ddqig",243],["Tdqig",246],["Sxg",249],["Usxg",252],["Dxsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],
 ["Sxsxg",267],["Spsxg",270],["Ocsxg",273],["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],
 ["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
 ];
@@ -50,10 +50,12 @@ async function loadData() {
     const weightsResponse = await fetch(weightsURL);
     const stagesResponse = await fetch(stagesURL);
     if (!weightsResponse.ok || !stagesResponse.ok) throw new Error('Network response was not ok');
-    const weightsData = await weightsResponse.json();
-    const stagesData = await stagesResponse.json();
-    weights = weightsData;
-    stages = stagesData;
+    weights = await weightsResponse.json();
+    stages = await stagesResponse.json();
+
+    console.log('Weights:', weights);
+    console.log('Stages:', stages);
+
     populateSelects();
   } catch (error) {
     console.error('Error loading JSON data:', error);
@@ -63,6 +65,7 @@ async function loadData() {
 function populateSelects() {
   const wSelect = document.getElementById('weightSelect');
   wSelect.innerHTML = '';
+
   const stagesSet = new Set(weights.map(w => w.stage));
   stagesSet.forEach(stg => {
     const stageWeights = weights.filter(w => w.stage === stg);
@@ -73,6 +76,7 @@ function populateSelects() {
       wSelect.appendChild(o);
     });
   });
+
   const sSelect = document.getElementById('stageSelect');
   sSelect.innerHTML = '';
   stages.forEach(s => {
@@ -92,6 +96,7 @@ function parseInput(str) {
 }
 
 function formatNum(num) {
+  if (num == null || isNaN(num)) return "N/A";
   for (let i = suffixes.length - 1; i >= 0; i--) {
     if (num >= Math.pow(10, suffixes[i][1]))
       return (num / Math.pow(10, suffixes[i][1])).toFixed(2) + suffixes[i][0];
@@ -127,12 +132,9 @@ function calculate() {
   const stage = stages.find(s => s.n === stageNum);
   if (!weight || !stage) return;
 
-  const weightObj = weights.find(w => w.name === weightName);
+  const stageWeights = weights.filter(w => w.stage === stage.n);
+  const weightObj = stageWeights.find(w => w.name === weightName);
   if (!weightObj) return;
-
-  const stageWeights = weights.filter(w => w.stage === stage.num);
-  const stageWeightObj = stageWeights.find(w => w.name === weightName);
-  if (!stageWeightObj) return;
 
   const gainStr = weightObj.gain;
 
@@ -146,7 +148,7 @@ function calculate() {
   const timeToNextWeight = nextWeight ? (nextWeight.cost - ownedCoins) / musclesPerSec : Infinity;
 
   const nextStage = stages.find(s => s.n > stage.n);
-  const nextStageCost = nextStage ? nextStage.m : Infinity;
+  const nextStageCost = nextStage ? stages.find(s => s.n === nextStage.n).m : Infinity;
   let totalNextStageCost = Infinity;
   if (nextStage) {
     const nextStageWeights = weights.filter(w => w.stage === nextStage.n);
