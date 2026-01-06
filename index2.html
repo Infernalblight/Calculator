@@ -93,7 +93,6 @@ function calculate(){
   const faster = document.getElementById('fasterLifter').checked;
   const doubleCoins = document.getElementById('doubleCoins').checked;
   const ownedMuscles = parseInput(document.getElementById('ownedMuscles').value||'0');
-  const ownedCoins = parseInput(document.getElementById('ownedCoins').value||'0');
 
   const weight = weights.find(w=>w.name===weightName);
   const stage = stages.find(s=>s.n===stageNum);
@@ -103,18 +102,27 @@ function calculate(){
   let musclesPerSec = musclesPerLift*stage.speed;
   if(faster) musclesPerSec*=2;
 
-  let rawCost = Number(weight.cost)-ownedMuscles;
-  if(rawCost<0) rawCost=0;
+  const stageWeights = weights.filter(w=>w.stage===weight.stage);
+  let nextWeight = stageWeights.find(w=>w.cost>weight.cost);
+  let timeToNextWeight = nextWeight ? (nextWeight.cost-ownedMuscles)/musclesPerSec : Infinity;
 
-  let timeSec = rawCost/musclesPerSec;
+  let nextStage = stages.find(s=>s.n>stage.n);
+  let nextStageCost = nextStage ? nextStage.m : Infinity;
+  let totalNextStageCost = Infinity;
+  if(nextStage){
+    const nextStageWeights = weights.filter(w=>w.stage===nextStage.n);
+    if(nextStageWeights.length>0) totalNextStageCost = nextStageWeights[0].cost-ownedMuscles;
+  }
+  let timeToNextStage = totalNextStageCost/musclesPerSec;
 
   document.getElementById('result').innerHTML=`
 Stage Multiplier: x${stage.m}<br>
 Weight: <strong>${weight.name}</strong><br>
-Weight Cost: <strong>${formatNum(Number(weight.cost))}</strong><br>
+Weight Cost: <strong>${formatNum(weight.cost)}</strong><br>
 Gain per Lift: <strong>${formatNum(weight.gain)}</strong><br>
 Muscles/sec: <strong>${formatNum(musclesPerSec)}</strong><br>
-Time to reach: <strong>${humanTime(timeSec)}</strong><br>
+Time to next weight: <strong>${humanTime(timeToNextWeight)}</strong><br>
+Time to next stage: <strong>${humanTime(timeToNextStage)}</strong><br>
 2× Muscles: ${doubleMuscles?"Yes":"No"}<br>
 Faster Lifter: ${faster?"Yes":"No"}<br>
 2× Coins Flag: ${doubleCoins?"Yes":"No"} (not used in muscle calc)
