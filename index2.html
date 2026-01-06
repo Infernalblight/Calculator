@@ -15,9 +15,7 @@
   --green-dark:#00b85c;
   --shadow:rgba(0,0,0,.35);
 }
-
 *{box-sizing:border-box;font-family:"Trebuchet MS",Arial,sans-serif}
-
 body{
   margin:0;
   min-height:100vh;
@@ -26,7 +24,6 @@ body{
   align-items:center;
   justify-content:center;
 }
-
 .main{
   width:1400px;
   max-width:96vw;
@@ -38,7 +35,6 @@ body{
   grid-template-columns:90px 1fr;
   gap:14px;
 }
-
 .sidebar{
   background:linear-gradient(180deg,#ffdf66,#e6b800);
   border-radius:22px;
@@ -48,7 +44,6 @@ body{
   padding:12px 8px;
   gap:12px;
 }
-
 .side-btn{
   width:64px;
   height:64px;
@@ -61,7 +56,6 @@ body{
   font-weight:900;
   color:#3b66ff;
 }
-
 .content{
   background:linear-gradient(180deg,var(--panel2),var(--panel));
   border-radius:22px;
@@ -70,7 +64,6 @@ body{
   grid-template-rows:auto 1fr;
   gap:12px;
 }
-
 .topbar{
   background:linear-gradient(180deg,#ffe681,#ffd33d);
   border-radius:18px;
@@ -78,7 +71,6 @@ body{
   display:flex;
   align-items:center;
 }
-
 .title{
   flex:1;
   text-align:center;
@@ -86,13 +78,11 @@ body{
   font-weight:900;
   color:#3b66ff;
 }
-
 .cards{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
 }
-
 .card{
   background:linear-gradient(180deg,#ffd84a,#e6b800);
   border-radius:20px;
@@ -101,7 +91,6 @@ body{
   flex-direction:column;
   gap:10px;
 }
-
 .card-title{
   background:linear-gradient(180deg,#fff0a6,#ffd33d);
   border-radius:14px;
@@ -111,9 +100,7 @@ body{
   font-weight:900;
   color:#3b66ff;
 }
-
 label{font-weight:800;color:white;font-size:14px}
-
 input,select{
   width:100%;
   border:none;
@@ -124,9 +111,7 @@ input,select{
   font-size:15px;
   outline:none;
 }
-
 .options{display:flex;gap:8px;flex-wrap:wrap}
-
 .option{
   flex:1;
   background:linear-gradient(180deg,#fff0a6,#ffd33d);
@@ -138,7 +123,6 @@ input,select{
   font-weight:900;
   color:#2b2b2b;
 }
-
 button{
   margin-top:6px;
   border:none;
@@ -150,7 +134,6 @@ button{
   background:linear-gradient(180deg,var(--green),var(--green-dark));
   cursor:pointer;
 }
-
 .results{
   background:linear-gradient(180deg,#fff0a6,#ffd33d);
   border-radius:14px;
@@ -159,7 +142,6 @@ button{
   color:#2b2b2b;
   line-height:1.6;
 }
-
 .value{color:#00a84a}
 </style>
 </head>
@@ -196,10 +178,10 @@ button{
       </div>
 
       <label>Already Have Muscles</label>
-      <input id="ownedMuscles" placeholder="e.g. 1Qad">
+      <input id="ownedMuscles">
 
       <label>Already Have Coins</label>
-      <input id="ownedCoins" placeholder="e.g. 300Td">
+      <input id="ownedCoins">
 
       <button id="calculateBtn">Calculate</button>
     </div>
@@ -223,7 +205,7 @@ const suffixes=[["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24]
 let weights=[],stages=[]
 
 function parseNum(str){
-  if(str==null)return 0
+  if(!str)return 0
   if(typeof str==="number")return str
   str=str.replace(/,/g,"").trim()
   for(const[s,p]of suffixes)if(str.toUpperCase().endsWith(s.toUpperCase()))return parseFloat(str)*10**p
@@ -273,8 +255,8 @@ function populate(){
 }
 
 function calculate(){
-  const ownedCoins=parseNum(document.getElementById("ownedCoins").value)
-  const ownedMuscles=parseNum(document.getElementById("ownedMuscles").value)
+  const ownedCoins=parseNum(ownedCoins.value)
+  const ownedMuscles=parseNum(ownedMuscles.value)
 
   const weight=weights.find(w=>w.name===weightSelect.value)
   const stage=stages.find(s=>s.n==stageSelect.value)
@@ -284,7 +266,6 @@ function calculate(){
 
   let liftsPerSecond=1
   if(fasterLifter.checked)liftsPerSecond*=1.866
-  liftsPerSecond*=stage.m
 
   let musclesPerSecond=musclesPerLift*liftsPerSecond
   let coinsPerSecond=doubleCoins.checked?musclesPerSecond*2:musclesPerSecond
@@ -293,10 +274,10 @@ function calculate(){
 
   const nextWeight=weights.find(w=>parseNum(w.cost)>effectiveCoins)
   const nextStage=stages.find(s=>s.n>stage.n)
-  const nextStageFirstWeight=nextStage?weights.find(w=>w.stage==nextStage.n):null
+  const nextStageWeight=nextStage?weights.find(w=>w.stage==nextStage.n):null
 
   const needWeight=nextWeight?Math.max(0,parseNum(nextWeight.cost)-effectiveCoins):0
-  const needStage=nextStageFirstWeight?Math.max(0,parseNum(nextStageFirstWeight.cost)-effectiveCoins):0
+  const needStage=nextStageWeight?Math.max(0,parseNum(nextStageWeight.cost)-effectiveCoins):0
 
   const timeToWeight=needWeight>0?needWeight/coinsPerSecond:0
   const timeToStage=needStage>0?needStage/coinsPerSecond:0
@@ -314,7 +295,7 @@ Lifts/sec: <span class="value">${liftsPerSecond.toFixed(3)}</span>
 `
 }
 
-document.getElementById("calculateBtn").onclick=calculate
+calculateBtn.onclick=calculate
 loadData()
 </script>
 
