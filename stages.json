@@ -1,5 +1,13 @@
 [
   {
+    "n": 0,
+    "gain": "x1",
+    "hp_gain": "x1",
+    "dmg_gain": "x1",
+    "speed_gain": "x1",
+    "cost": 0
+  },
+  {
     "n": 1,
     "gain": "x2",
     "hp_gain": "x2",
