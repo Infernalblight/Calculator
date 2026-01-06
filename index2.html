@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Lifting Simulator Calculator</title>
 <style>
 body { font-family: Arial, sans-serif; margin: 20px; background:#f0f0f0; }
@@ -12,28 +12,20 @@ button { padding: 10px; margin: 10px 0; }
 </style>
 </head>
 <body>
-
 <h1>Lifting Simulator Calculator</h1>
-
 <label for="weightSelect">Select Weight:</label>
 <select id="weightSelect"></select><br>
-
 <label for="stageSelect">Select Stage:</label>
 <select id="stageSelect"></select><br>
-
 <label><input type="checkbox" id="doubleMuscles"> 2× Muscles</label><br>
 <label><input type="checkbox" id="fasterLifter"> Faster Lifter</label><br>
 <label><input type="checkbox" id="doubleCoins"> 2× Coins (not used in muscle calc)</label><br>
-
 <label for="ownedMuscles">Already Have Muscles:</label>
-<input type="text" id="ownedMuscles" placeholder="e.g. 2.5Qi"><br>
+<input type="text" id="ownedMuscles" placeholder="e.g. 2.5Qi" /><br>
 <label for="ownedCoins">Already Have Coins:</label>
-<input type="text" id="ownedCoins" placeholder="e.g. 1T"><br>
-
+<input type="text" id="ownedCoins" placeholder="e.g. 1T" /><br>
 <button id="calculateBtn">Calculate</button>
-
 <div id="result"></div>
-
 <script>
 const weightsURL = 'https://liftingsimulatorcalculator.netlify.app/weights.json';
 const stagesURL = 'https://liftingsimulatorcalculator.netlify.app/stages.json';
@@ -54,99 +46,115 @@ const suffixes = [
 ];
 
 async function loadData() {
-  weights = await fetch(weightsURL).then(r=>r.json());
-  stages = await fetch(stagesURL).then(r=>r.json());
+  try {
+    const weightsResponse = await fetch(weightsURL);
+    const stagesResponse = await fetch(stagesURL);
+    if (!weightsResponse.ok || !stagesResponse.ok) throw new Error('Network response was not ok');
+    const weightsData = await weightsResponse.json();
+    const stagesData = await stagesResponse.json();
+    weights = weightsData;
+    stages = stagesData;
+    populateSelects();
+  } catch (error) {
+    console.error('Error loading JSON data:', error);
+  }
+}
 
+function populateSelects() {
   const wSelect = document.getElementById('weightSelect');
-  weights.forEach(w=>{
-    let o=document.createElement('option');
-    o.value=w.name;
-    o.text=`${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${formatNum(w.gain)})`;
+  wSelect.innerHTML = '';
+  weights.forEach(w => {
+    let o = document.createElement('option');
+    o.value = w.name;
+    o.text = `${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${formatNum(w.gain)})`;
     wSelect.appendChild(o);
   });
-
   const sSelect = document.getElementById('stageSelect');
-  stages.forEach(s=>{
-    let o=document.createElement('option');
-    o.value=s.n;
-    o.text=`Stage ${s.n} x${formatNum(s.m)}`;
+  sSelect.innerHTML = '';
+  stages.forEach(s => {
+    let o = document.createElement('option');
+    o.value = s.n;
+    o.text = `Stage ${s.n} x${formatNum(s.m)}`;
     sSelect.appendChild(o);
   });
 }
 
 function parseInput(str) {
-  str = str.replace(/,/g,'').trim().toUpperCase();
-  for(let [s,p] of suffixes){
-    if(str.endsWith(s)) return parseFloat(str.slice(0,-s.length))*Math.pow(10,p);
+  str = str.replace(/,/g, '').trim().toUpperCase();
+  for (let [s, p] of suffixes) {
+    if (str.endsWith(s)) return parseFloat(str.slice(0, -s.length)) * Math.pow(10, p);
   }
   return parseFloat(str) || 0;
 }
 
-function formatNum(num){
-  for(let i=suffixes.length-1;i>=0;i--){
-    if(num>=Math.pow(10,suffixes[i][1])) return (num/Math.pow(10,suffixes[i][1])).toFixed(2)+suffixes[i][0];
+function formatNum(num) {
+  for (let i = suffixes.length - 1; i >= 0; i--) {
+    if (num >= Math.pow(10, suffixes[i][1]))
+      return (num / Math.pow(10, suffixes[i][1])).toFixed(2) + suffixes[i][0];
   }
-  if(num>=1e3) return (num/1e3).toFixed(2)+'K';
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
   return num.toFixed(2);
 }
 
-function humanTime(sec){
-  if(!isFinite(sec)) return "∞";
-  if(sec<60) return sec.toFixed(2)+" seconds";
-  let m=sec/60;if(m<60)return m.toFixed(2)+" minutes";
-  let h=m/60;if(h<24)return h.toFixed(2)+" hours";
-  let d=h/24;if(d<365)return d.toFixed(2)+" days";
-  let y=d/365;if(y<1000)return y.toFixed(2)+" years";
-  return (y/1000).toFixed(2)+"k years";
+function humanTime(sec) {
+  if (!isFinite(sec)) return "∞";
+  if (sec < 60) return sec.toFixed(2) + " seconds";
+  let m = sec / 60;
+  if (m < 60) return m.toFixed(2) + " minutes";
+  let h = m / 60;
+  if (h < 24) return h.toFixed(2) + " hours";
+  let d = h / 24;
+  if (d < 365) return d.toFixed(2) + " days";
+  let y = d / 365;
+  if (y < 1000) return y.toFixed(2) + " years";
+  return (y / 1000).toFixed(2) + "k years";
 }
 
-function calculate(){
+function calculate() {
   const weightName = document.getElementById('weightSelect').value;
   const stageNum = parseInt(document.getElementById('stageSelect').value);
   const doubleMuscles = document.getElementById('doubleMuscles').checked;
   const faster = document.getElementById('fasterLifter').checked;
   const doubleCoins = document.getElementById('doubleCoins').checked;
-  const ownedMuscles = parseInput(document.getElementById('ownedMuscles').value||'0');
-  const ownedCoins = parseInput(document.getElementById('ownedCoins').value||'0');
+  const ownedMuscles = parseInput(document.getElementById('ownedMuscles').value || '0');
+  const ownedCoins = parseInput(document.getElementById('ownedCoins').value || '0');
 
-  const weight = weights.find(w=>w.name===weightName);
-  const stage = stages.find(s=>s.n===stageNum);
+  const weight = weights.find(w => w.name === weightName);
+  const stage = stages.find(s => s.n === stageNum);
+  if (!weight || !stage) return;
 
   let musclesPerLift = weight.gain;
-  if(doubleMuscles) musclesPerLift *= 2;
+  if (doubleMuscles) musclesPerLift *= 2;
 
   let musclesPerSec = musclesPerLift * stage.speed;
-  if(faster) musclesPerSec *= 2;
+  if (faster) musclesPerSec *= 2;
 
-  // Time to next weight
-  let stageWeights = weights.filter(w=>w.stage===weight.stage);
-  let nextWeight = stageWeights.find(w=>w.cost>ownedCoins);
-  let timeToNextWeight = nextWeight ? (nextWeight.cost-ownedCoins)/musclesPerSec : Infinity;
+  const stageWeights = weights.filter(w => w.stage === weight.stage);
+  const nextWeight = stageWeights.find(w => w.cost > ownedCoins);
+  const timeToNextWeight = nextWeight ? (nextWeight.cost - ownedCoins) / musclesPerSec : Infinity;
 
-  // Time to next stage
-  let nextStage = stages.find(s=>s.n>stage.n);
-  let nextStageCost = nextStage ? nextStage.m : Infinity;
+  const nextStage = stages.find(s => s.n > stage.n);
+  const nextStageCost = nextStage ? nextStage.m : Infinity;
   let totalNextStageCost = Infinity;
-  if(nextStage){
-    const nextStageWeights = weights.filter(w=>w.stage===nextStage.n);
-    if(nextStageWeights.length>0) totalNextStageCost = nextStageWeights[0].cost-ownedCoins;
+  if (nextStage) {
+    const nextStageWeights = weights.filter(w => w.stage === nextStage.n);
+    if (nextStageWeights.length > 0) totalNextStageCost = nextStageWeights[0].cost;
   }
-  let timeToNextStage = totalNextStageCost/musclesPerSec;
+  const timeToNextStage = totalNextStageCost / musclesPerSec;
 
-  document.getElementById('result').innerHTML=`<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
+  document.getElementById('result').innerHTML = `<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
 <b>Weight:</b> ${weight.name}<br>
 <b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
 <b>Gain per Lift:</b> ${formatNum(weight.gain)}<br>
 <b>Muscles/sec:</b> ${formatNum(musclesPerSec)}<br>
 <b>Time to next Weight:</b> ${humanTime(timeToNextWeight)}<br>
 <b>Time to next Stage:</b> ${humanTime(timeToNextStage)}<br>
-<b>2× Muscles:</b> ${doubleMuscles?"Yes":"No"}<br>
-<b>Faster Lifter:</b> ${faster?"Yes":"No"}<br>
-<b>2× Coins Flag:</b> ${doubleCoins?"Yes":"No"} (not used in muscle calc)
-  `;
+<b>2× Muscles:</b> ${doubleMuscles ? "Yes" : "No"}<br>
+<b>Faster Lifter:</b> ${faster ? "Yes" : "No"}<br>
+<b>2× Coins Flag:</b> ${doubleCoins ? "Yes" : "No"} (not used in muscle calc)`;
 }
 
-document.getElementById('calculateBtn').addEventListener('click',calculate);
+document.getElementById('calculateBtn').addEventListener('click', calculate);
 loadData();
 </script>
 </body>
