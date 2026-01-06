@@ -31,6 +31,7 @@ const weightsURL = 'https://liftingsimulatorcalculator.netlify.app/weights.json'
 const stagesURL = 'https://liftingsimulatorcalculator.netlify.app/stages.json';
 
 let weights = [], stages = [];
+
 const suffixes = [
   ["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],
   ["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],
@@ -51,15 +52,30 @@ async function loadData() {
     if (!weightsResponse.ok || !stagesResponse.ok) throw new Error('Network response was not ok');
     weights = await weightsResponse.json();
     stages = await stagesResponse.json();
-
     stages.forEach(stage => {
-      stage.gainMultiplier = parseFloat(stage.gain.replace('x', ''));
+      stage.gainMultiplier = parseGain(stage.gain);
     });
-
     populateSelects();
   } catch (error) {
     console.error('Error loading JSON data:', error);
   }
+}
+
+function parseGain(str) {
+  const match = str.match(/^x([\d.]+)([A-Za-z]+)?$/);
+  if (!match) return 1;
+  const numberPart = parseFloat(match[1]);
+  const suffixPart = match[2];
+  if (!suffixPart) return numberPart;
+  const scale = getScale(suffixPart);
+  return numberPart * scale;
+}
+
+function getScale(suffix) {
+  for (let [sfx, scale] of suffixes) {
+    if (sfx.toLowerCase() === suffix.toLowerCase()) return Math.pow(10, scale);
+  }
+  return 1;
 }
 
 function populateSelects() {
