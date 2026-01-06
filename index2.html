@@ -249,6 +249,9 @@ button{
 const weightsURL="weights.json"
 const stagesURL="stages.json"
 
+const ownedCoinsInput=document.getElementById("ownedCoins")
+const ownedMusclesInput=document.getElementById("ownedMuscles")
+
 let weights=[],stages=[]
 
 const suffixes=[["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120]]
@@ -289,14 +292,24 @@ function populate(){
   stageSelect.innerHTML=""
   stages.sort((a,b)=>a.n-b.n)
   weights.sort((a,b)=>parseNum(a.cost)-parseNum(b.cost))
-  for(const st of stages){const o=document.createElement("option");o.value=st.n;o.text="Stage "+st.n;stageSelect.appendChild(o)}
-  for(const w of weights){const o=document.createElement("option");o.value=w.name;o.text=`${w.name} | Cost ${formatNum(w.cost)} | Gain ${w.gain}`;weightSelect.appendChild(o)}
+  for(const st of stages){
+    const o=document.createElement("option")
+    o.value=st.n
+    o.text="Stage "+st.n
+    stageSelect.appendChild(o)
+  }
+  for(const w of weights){
+    const o=document.createElement("option")
+    o.value=w.name
+    o.text=`${w.name} | Cost ${formatNum(w.cost)} | Gain ${w.gain}`
+    weightSelect.appendChild(o)
+  }
 }
 
 function calculate(){
   const weight=weights.find(w=>w.name===weightSelect.value)
   const stage=stages.find(s=>s.n==stageSelect.value)
-  const ownedCoins=parseNum(ownedCoins.value)
+  const ownedCoins=parseNum(ownedCoinsInput.value)
 
   let gain=parseNum(weight.gain)*parseNum(stage.gainMultiplier)
   if(doubleMuscles.checked)gain*=2
