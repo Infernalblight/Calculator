@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LiftSim Calculators</title>
+<title>LiftSim Calculator</title>
 
 <style>
 :root{
@@ -29,15 +29,10 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  overflow:hidden;
-}
-
-.ui-scale{
-  transform-origin:center;
 }
 
 .main{
-  width:1500px;
+  width:1400px;
   max-width:96vw;
   background:linear-gradient(180deg,var(--yellow1),var(--yellow2));
   border-radius:28px;
@@ -93,15 +88,6 @@ body{
   box-shadow:0 6px 0 rgba(0,0,0,.25);
 }
 
-.back{
-  background:linear-gradient(180deg,#6fd3ff,#2fb2ff);
-  padding:6px 14px;
-  border-radius:14px;
-  font-weight:900;
-  color:white;
-  box-shadow:0 4px 0 rgba(0,0,0,.25);
-}
-
 .title{
   flex:1;
   text-align:center;
@@ -114,7 +100,7 @@ body{
 
 .cards{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
+  grid-template-columns:1fr 1fr;
   gap:14px;
 }
 
@@ -200,27 +186,9 @@ button{
   box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:linear-gradient(180deg,#fff0a6,#ffd33d);
-  border-radius:14px;
-  overflow:hidden;
-  font-weight:900;
-  color:#2b2b2b;
-}
-
-th,td{
-  padding:6px 8px;
-  border-bottom:2px solid #e0b800;
-  font-size:13px;
-}
-
-th{text-align:left}
-td{text-align:right}
 .value{color:#00a84a}
 
-@media (max-width:1100px){
+@media (max-width:1000px){
   .cards{grid-template-columns:1fr}
   .main{grid-template-columns:70px 1fr}
 }
@@ -228,124 +196,136 @@ td{text-align:right}
 </head>
 <body>
 
-<div class="ui-scale" id="scaleRoot">
 <div class="main">
 
 <div class="sidebar">
-  <div class="side-btn">1</div>
-  <div class="side-btn">2</div>
-  <div class="side-btn">3</div>
+  <div class="side-btn">🏋</div>
+  <div class="side-btn">💰</div>
+  <div class="side-btn">⚡</div>
 </div>
 
 <div class="content">
   <div class="topbar">
-    <div class="back">Back</div>
-    <div class="title">🏋 Lifting Calculators 🏋</div>
+    <div class="title">🏋 Lifting Simulator Calculator 🏋</div>
   </div>
 
   <div class="cards">
 
     <div class="card">
-      <div class="card-title">Muscle Timeline</div>
-      <label>Muscles per lift</label>
-      <input id="mpl">
-      <label>Muscles you already have</label>
-      <input id="musclesHave">
-      <label>Clicks per second</label>
-      <input id="cps1">
+      <div class="card-title">Setup</div>
+
+      <label>Weight</label>
+      <select id="weightSelect"></select>
+
+      <label>Stage</label>
+      <select id="stageSelect"></select>
+
       <div class="options">
-        <label class="option"><input id="fast1" type="checkbox"> Fast Lifter</label>
+        <label class="option"><input type="checkbox" id="doubleMuscles"> 2× Muscles</label>
+        <label class="option"><input type="checkbox" id="fasterLifter"> Faster Lifter</label>
+        <label class="option"><input type="checkbox" id="doubleCoins"> 2× Coins</label>
       </div>
-      <button onclick="calcTimeline()">Calculate</button>
-      <table id="timeline"></table>
+
+      <label>Already Have Muscles</label>
+      <input id="ownedMuscles" placeholder="e.g. 1Qad">
+
+      <label>Already Have Coins</label>
+      <input id="ownedCoins" placeholder="e.g. 300Td">
+
+      <button id="calculateBtn">Calculate</button>
     </div>
 
     <div class="card">
-      <div class="card-title">Coin Target</div>
-      <label>Coins needed</label>
-      <input id="coinsNeeded">
-      <label>Coins you have</label>
-      <input id="coinsHave">
-      <label>Muscles per lift</label>
-      <input id="mpl2">
-      <label>Muscles you already have</label>
-      <input id="musclesHave2">
-      <label>Clicks per second</label>
-      <input id="cps2">
-      <div class="options">
-        <label class="option"><input id="doubleCoins" type="checkbox"> 2× Coins</label>
-        <label class="option"><input id="fast2" type="checkbox"> Fast Lifter</label>
-      </div>
-      <button onclick="calcCoins()">Calculate</button>
-      <div class="results" id="coinResults"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Bloodline</div>
-      <label>Bloodline per minion</label>
-      <input id="bloodPerKill">
-      <label>Minions killed at once</label>
-      <select id="minionsAtOnce">
-        <option value="1">1</option>
-        <option value="2">2</option>
-      </select>
-      <label>Kill time (seconds)</label>
-      <input id="killTime" value="10.2">
-      <label>Bloodline needed</label>
-      <input id="bloodNeeded">
-      <button onclick="calcBloodline()">Calculate</button>
-      <div class="results" id="bloodResults"></div>
+      <div class="card-title">Results</div>
+      <div class="results" id="result"></div>
     </div>
 
   </div>
 </div>
 
 </div>
-</div>
 
 <script>
-const API_URL="https://liverpool-silk-chapter-wells.trycloudflare.com"
+const weightsURL="weights.json"
+const stagesURL="stages.json"
 
-function autoScale(){
-  const baseW=1500
-  const scale=Math.min(window.innerWidth/baseW,1)
-  document.getElementById("scaleRoot").style.transform=`scale(${scale})`
-}
-window.addEventListener("resize",autoScale)
-autoScale()
+let weights=[],stages=[]
 
-function formatVal(v){
-  const u=["","K","M","B","T","QA","QI","SX","SP","OC","NO","DC"]
-  let i=0
-  while(v>=1000&&i<u.length-1){v/=1000;i++}
-  return v.toFixed(3)+" "+u[i]
+const suffixes=[["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120]]
+
+function parseNum(str){
+  if(str==null)return 0
+  if(typeof str==="number")return str
+  str=str.replace(/,/g,"").trim()
+  for(const[s,p]of suffixes)if(str.toUpperCase().endsWith(s.toUpperCase()))return parseFloat(str)*10**p
+  return parseFloat(str)||0
 }
 
-function renderTimeline(perSec,have){
-  timeline.innerHTML="<tr><th>Time</th><th>Total Muscles</th></tr>"
-  const add=(l,s)=>timeline.innerHTML+=`<tr><th>${l}</th><td class="value">${formatVal(have+perSec*s)}</td></tr>`
-  for(let m=1;m<=59;m++)add(m+" min",m*60)
-  for(let h=1;h<=23;h++)add(h+" hour",h*3600)
-  for(let d=1;d<=6;d++)add(d+" day",d*86400)
+function formatNum(n){
+  n=parseNum(n)
+  if(!isFinite(n))return "∞"
+  for(let i=suffixes.length-1;i>=0;i--)if(n>=10**suffixes[i][1])return(n/10**suffixes[i][1]).toFixed(2)+suffixes[i][0]
+  if(n>=1e3)return(n/1e3).toFixed(2)+"K"
+  return n.toFixed(2)
 }
 
-async function calcTimeline(){
-  const r=await fetch(API_URL+"/calc/muscle",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mpl:mpl.value,have:musclesHave.value,cps:cps1.value,fast:fast1.checked})})
-  const d=await r.json()
-  renderTimeline(d.perSecond,Number(musclesHave.value)||0)
+function humanTime(sec){
+  if(!isFinite(sec))return"∞"
+  if(sec<60)return sec.toFixed(2)+"s"
+  sec/=60;if(sec<60)return sec.toFixed(2)+"m"
+  sec/=60;if(sec<24)return sec.toFixed(2)+"h"
+  sec/=24;return sec.toFixed(2)+"d"
 }
 
-async function calcCoins(){
-  const r=await fetch(API_URL+"/calc/coins",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({need:coinsNeeded.value,haveCoins:coinsHave.value,mpl:mpl2.value,haveMuscles:musclesHave2.value,cps:cps2.value,doubleCoins:doubleCoins.checked,fast:fast2.checked})})
-  const d=await r.json()
-  coinResults.innerHTML=`Time needed: <span class="value">${d.exact}</span><br>Days: <span class="value">${d.days.toFixed(2)}</span><br>Hours: <span class="value">${d.hours.toFixed(2)}</span><br>Minutes: <span class="value">${d.minutes.toFixed(2)}</span><br>Seconds: <span class="value">${d.seconds.toFixed(2)}</span>`
+async function loadData(){
+  const[w,s]=await Promise.all([fetch(weightsURL),fetch(stagesURL)])
+  weights=await w.json()
+  stages=await s.json()
+  populate()
 }
 
-async function calcBloodline(){
-  const r=await fetch(API_URL+"/calc/bloodline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({perKill:bloodPerKill.value,count:minionsAtOnce.value,killTime:killTime.value,need:bloodNeeded.value})})
-  const d=await r.json()
-  bloodResults.innerHTML=`Bloodline per minute: <span class="value">${formatVal(d.perMinute)}</span><br>Exact time: <span class="value">${d.exact}</span><br>Days: <span class="value">${d.days.toFixed(2)}</span><br>Hours: <span class="value">${d.hours.toFixed(2)}</span><br>Minutes: <span class="value">${d.minutes.toFixed(2)}</span><br>Seconds: <span class="value">${d.seconds.toFixed(2)}</span>`
+function populate(){
+  weightSelect.innerHTML=""
+  stageSelect.innerHTML=""
+  stages.sort((a,b)=>a.n-b.n)
+  weights.sort((a,b)=>parseNum(a.cost)-parseNum(b.cost))
+  for(const st of stages){const o=document.createElement("option");o.value=st.n;o.text="Stage "+st.n;stageSelect.appendChild(o)}
+  for(const w of weights){const o=document.createElement("option");o.value=w.name;o.text=`${w.name} | Cost ${formatNum(w.cost)} | Gain ${w.gain}`;weightSelect.appendChild(o)}
 }
+
+function calculate(){
+  const weight=weights.find(w=>w.name===weightSelect.value)
+  const stage=stages.find(s=>s.n==stageSelect.value)
+  const ownedCoins=parseNum(ownedCoins.value)
+
+  let gain=parseNum(weight.gain)*parseNum(stage.gainMultiplier)
+  if(doubleMuscles.checked)gain*=2
+
+  let liftsPerSec=stage.m
+  if(fasterLifter.checked)liftsPerSec*=1.866
+
+  let perSecond=gain*liftsPerSec
+  let coinsPerSecond=doubleCoins.checked?perSecond*2:perSecond
+
+  const nextWeight=weights.find(w=>parseNum(w.cost)>ownedCoins)
+  const nextStage=stages.find(s=>s.n>stage.n)
+
+  const timeToWeight=nextWeight?(parseNum(nextWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
+  const timeToStage=nextStage?((parseNum(weights.filter(w=>w.stage==nextStage.n)[0]?.cost)||Infinity)-ownedCoins)/coinsPerSecond:Infinity
+
+  result.innerHTML=`
+Muscles per lift: <span class="value">${formatNum(gain)}</span><br>
+Muscles per second: <span class="value">${formatNum(perSecond)}</span><br><br>
+Coins per second: <span class="value">${formatNum(coinsPerSecond)}</span><br>
+Time to next weight: <span class="value">${humanTime(timeToWeight)}</span><br>
+Time to next stage: <span class="value">${humanTime(timeToStage)}</span><br><br>
+Stage multiplier: <span class="value">x${stage.gainMultiplier}</span><br>
+Lifts/sec: <span class="value">${liftsPerSec.toFixed(3)}</span>
+`
+}
+
+calculateBtn.onclick=calculate
+loadData()
 </script>
 
 </body>
