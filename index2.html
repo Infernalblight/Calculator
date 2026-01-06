@@ -16,40 +16,55 @@ body{
 .card{
   max-width:900px;
   margin:auto;
-  background:#12172a;
-  padding:24px;
-  border-radius:18px;
-  box-shadow:0 30px 80px rgba(0,0,0,.5);
+  background:linear-gradient(180deg,#121a33,#0b0f1a);
+  padding:28px;
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
 }
 h1{margin-top:0}
 input,select,button{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin:6px 0 14px 0;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
   outline:none;
   font-size:15px;
 }
-input,select{background:#0b0f1a;color:#e8ebff}
+input,select{background:#050812;color:#e8ebff}
 button{
   background:#7c9cff;
-  color:#0b0f1a;
-  font-weight:700;
+  color:#050812;
+  font-weight:800;
   cursor:pointer;
 }
 button:hover{opacity:.85}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 label{font-size:14px;opacity:.85}
 #result{
   margin-top:18px;
-  background:#0b0f1a;
+  background:#050812;
   padding:18px;
   border-radius:14px;
-  line-height:1.55;
+  line-height:1.6;
 }
 .small{opacity:.75;font-size:13px}
-.checks label{display:block}
+.checks{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:14px;
+  margin:10px 0 14px 0;
+}
+.checks label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#050812;
+  padding:12px;
+  border-radius:12px;
+  cursor:pointer;
+}
+.checks input{width:auto;margin:0}
 </style>
 </head>
 
@@ -167,15 +182,13 @@ function humanTime(sec){
   sec/=60
   if(sec<24)return sec.toFixed(2)+"h"
   sec/=24
-  if(sec<365)return sec.toFixed(2)+"d"
-  return (sec/365).toFixed(2)+"y"
+  return sec.toFixed(2)+"d"
 }
 
 function calculate(){
   const weight=weights.find(w=>w.name===weightSelect.value)
   const stage=stages.find(s=>s.n==stageSelect.value)
 
-  const ownedMuscles=parseNum(ownedMusclesInput.value)
   const ownedCoins=parseNum(ownedCoinsInput.value)
 
   let gain=parseNum(weight.gain)
@@ -183,8 +196,10 @@ function calculate(){
 
   if(doubleMuscles.checked)gain*=2
 
-  let perSecond=gain*stage.m
-  if(fasterLifter.checked)perSecond*=2
+  let liftsPerSec=stage.m
+  if(fasterLifter.checked)liftsPerSec*=1.866
+
+  let perSecond=gain*liftsPerSec
 
   let coinsPerSecond=perSecond
   if(doubleCoins.checked)coinsPerSecond*=2
@@ -205,7 +220,7 @@ function calculate(){
 
 <span class="small">
 Stage multiplier: x${stage.gainMultiplier}<br>
-Lifts/sec: ${stage.m}
+Lifts/sec: ${liftsPerSec.toFixed(3)}
 </span>
 `
 }
