@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage & Weight Calculator</title>
+
+<style>
+:root{
+  --yellow1:#f7c400;
+  --yellow2:#e0a800;
+  --panel:#b88900;
+  --panel2:#d6a600;
+  --slot:#ffd84a;
+  --green:#00e676;
+  --green-dark:#00b85c;
+  --blue:#4fc3ff;
+  --shadow:rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box;font-family:"Trebuchet MS",Arial,sans-serif}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:radial-gradient(circle at top,#3cff85,#00b85c 60%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.main{
+  width:1400px;
+  max-width:96vw;
+  background:linear-gradient(180deg,var(--yellow1),var(--yellow2));
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 30px 90px var(--shadow);
+}
+
+.topbar{
+  background:linear-gradient(180deg,#ffe681,#ffd33d);
+  border-radius:18px;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 6px 0 rgba(0,0,0,.25);
+}
+
+.title{
+  font-size:34px;
+  font-weight:900;
+  color:#3b66ff;
+  text-shadow:0 2px 0 rgba(0,0,0,.25);
+}
+
+.panel{
+  margin-top:14px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border-radius:22px;
+  padding:16px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.18);
+}
+
+.card{
+  background:linear-gradient(180deg,#ffd84a,#e6b800);
+  border-radius:20px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  box-shadow:0 10px 30px var(--shadow), inset 0 -5px 0 rgba(0,0,0,.2);
+}
+
+.card-title{
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
+  border-radius:14px;
+  padding:8px;
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+  color:#3b66ff;
+  text-shadow:0 2px 0 rgba(0,0,0,.25);
+}
+
+label{
+  font-weight:900;
+  color:white;
+  text-shadow:0 1px 0 rgba(0,0,0,.25);
+  font-size:14px;
+}
+
+input,select{
+  width:100%;
+  border:none;
+  border-radius:14px;
+  padding:12px;
+  background:#ffe88a;
+  font-weight:900;
+  font-size:15px;
+  outline:none;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
+}
+
+.options{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.option{
+  flex:1;
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
+  border-radius:12px;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:900;
+  color:#2b2b2b;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
+}
+
+button{
+  margin-top:6px;
+  border:none;
+  border-radius:16px;
+  padding:12px;
+  font-size:22px;
+  font-weight:900;
+  color:white;
+  background:linear-gradient(180deg,var(--green),var(--green-dark));
+  box-shadow:0 6px 0 rgba(0,0,0,.3);
+  cursor:pointer;
+}
+
+.results{
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
+  border-radius:14px;
+  padding:10px;
+  font-weight:900;
+  color:#2b2b2b;
+  line-height:1.6;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
+}
+</style>
+</head>
+<body>
+
+<div class="main">
+  <div class="topbar">
+    <div class="title">🏋 Stage & Weight Calculator 🏋</div>
+  </div>
+
+  <div class="panel">
+
+    <div class="card">
+      <div class="card-title">Stage & Weight</div>
+
+      <label>Select stage</label>
+      <select id="stageSelect"></select>
+
+      <label>Search weight</label>
+      <input id="weightSearch" placeholder="Type your weight name...">
+
+      <label>Your base muscle per lift</label>
+      <input id="baseGain">
+
+      <label>Clicks per second</label>
+      <input id="cps">
+
+      <div class="options">
+        <label class="option"><input id="gpMuscle" type="checkbox"> 2× Muscles</label>
+        <label class="option"><input id="gpCoins" type="checkbox"> 2× Coins</label>
+        <label class="option"><input id="fast" type="checkbox"> Faster Lifter</label>
+      </div>
+
+      <button onclick="calculate()">Calculate</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Next Weight Result</div>
+      <div class="results" id="resultBox">Fill inputs and press Calculate.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const stages=[
+{n:1,m:2,c:"2M"},{n:2,m:5,c:"150M"},{n:3,m:19,c:"5B"},{n:4,m:99,c:"125B"},
+{n:5,m:499,c:"4.3T"},{n:6,m:2999,c:"160T"},{n:7,m:19000,c:"5.4Qa"},
+{n:8,m:159000,c:"630Qa"},{n:9,m:1990000,c:"25Qi"},{n:10,m:29900000,c:"370Qi"},
+{n:11,m:599000000,c:"90Sx"},{n:12,m:14900000000,c:"28.8Sp"},
+{n:13,m:449000000000,c:"12.49Oc"},{n:14,m:15900000000000,c:"6.09No"},
+{n:15,m:629000000000000,c:"3.44Dc"},{n:16,m:28900000000000000,c:"2.77Ud"},
+{n:17,m:1.49e18,c:"2.44Dd"},{n:18, m:7.79e19,c:"2.549Td"},
+{n:19,m:5.555e21,c:"2.99Qad"},{n:20,m:2.79e23,c:"16.9Qid"},
+{n:21,m:1.39e25,c:"13.3Sxd"},{n:22,m:6.99e26,c:"9.99Spd"},
+{n:23,m:3.49e28,c:"8.99Ocd"},{n:24,m:1.99e30,c:"5.99Nod"},
+{n:25,m:9.99e31,c:"5.55Vg"},{n:26,m:5.555e33,c:"12.2Uvg"},
+{n:27,m:2.99e35,c:"345Tvg"},{n:28,m:1.99e37,c:"75.5Sxvg"},
+{n:29,m:9.99e38,c:"199Novg"},{n:30,m:5.555e40,c:"5.55Ttg"}
+]
+
+const weights = [
+  { name:"Pencil", cost:0, muscles:1 },
+  { name:"Stick", cost:15, muscles:2 },
+  { name:"Mouse", cost:45, muscles:3 },
+  { name:"Water Bottle", cost:90, muscles:5 },
+  { name:"Soccer Ball", cost:187.5, muscles:7 },
+  { name:"Bottle", cost:315, muscles:10 },
+  { name:"Textbook", cost:600, muscles:16 },
+  { name:"Bucket", cost:1200, muscles:24 },
+  { name:"Wood", cost:2150, muscles:33 },
+  { name:"Guitar", cost:3475, muscles:44 },
+  { name:"Chair", cost:5275, muscles:62 },
+  { name:"Shopping Cart", cost:8375, muscles:85 },
+  { name:"TV", cost:12750, muscles:110 },
+  { name:"Bicycle", cost:19800, muscles:140 },
+  { name:"Desk", cost:29250, muscles:185 },
+  { name:"Bed", cost:44250, muscles:280 },
+  { name:"Log", cost:75500, muscles:370 },
+  { name:"Canoe", cost:111000, muscles:555 },
+  { name:"Tire", cost:208000, muscles:790 },
+  { name:"Refrigerator", cost:355000, muscles:1010 },
+  { name:"Drum", cost:1212000, muscles:1550 },
+  { name:"Hydrant", cost:2325000, muscles:2240 },
+  { name:"Piano", cost:4025000, muscles:4090 },
+  { name:"Motorcycle", cost:9800000, muscles:6300 },
+  { name:"Safe", cost:18900000, muscles:8450 },
+  { name:"Flag", cost:30250000, muscles:10000 },
+  { name:"ATM", cost:105000000, muscles:16100 },
+  { name:"RX-7", cost:193200000, muscles:25200 },
+  { name:"EVO", cost:340000000, muscles:36300 },
+  { name:"G-Class", cost:570000000, muscles:49400 },
+  { name:"Van", cost:887500000, muscles:69500 },
+  { name:"Tree", cost:5349000000, muscles:95590 },
+  { name:"Container", cost:8175000000, muscles:142700 },
+  { name:"Sailboat", cost:13400000000, muscles:191800 },
+  { name:"Bus", cost:19670000000, muscles:260800 },
+  { name:"Truck", cost:29000000000, muscles:341000 },
+  { name:"Windmill", cost:212500000000, muscles:465000 },
+  { name:"Jet", cost:310000000000, muscles:623000 },
+  { name:"Tank", cost:442500000000, muscles:794000 },
+  { name:"Transport Helicopter", cost:600000000000, muscles:1000000 },
+  { name:"Battleship", cost:5390000000000, muscles:1310000 },
+  { name:"Spaceship", cost:8240000000000, muscles:1700000 },
+  { name:"Speaker", cost:12190000000000, muscles:2210000 },
+  { name:"Anchor", cost:17900000000000, muscles:2880000 },
+  { name:"Old House", cost:25800000000000, muscles:3740000 },
+  { name:"Apartment", cost:222000000000000, muscles:4860000 },
+  { name:"Toxic Tank", cost:315000000000000, muscles:6320000 },
+  { name:"Rocket", cost:444000000000000, muscles:8220000 },
+  { name:"Castle", cost:621000000000000, muscles:10690000 },
+  { name:"Torpedo", cost:925000000000000, muscles:13900000 },
+  { name:"Signal Tower", cost:8550000000000000, muscles:18000000 },
+  { name:"Stone Altar", cost:12300000000000000, muscles:23390000 },
+  { name:"UFO", cost:17600000000000000, muscles:30000000 },
+  { name:"Ancient Place", cost:24890000000000000, muscles:40000000 },
+  { name:"Pyramid", cost:38290000000000000, muscles:51500000 },
+  { name:"Canyon Mt", cost:471000000000000000, muscles:66000000 },
+  { name:"Mountain", cost:680000000000000000, muscles:88000000 },
+  { name:"Volcano", cost:1000000000000000000, muscles:110000000 },
+  { name:"Mount Fuji", cost:1379000000000000000, muscles:150000000 },
+  { name:"Meteorite", cost:2060000000000000000, muscles:191000000 },
+  { name:"Moon", cost:36900000000000000000, muscles:250000000 },
+  { name:"Mercury", cost:55500000000000000000, muscles:323000000 },
+  { name:"Mars", cost:84400000000000000000, muscles:420000000 },
+  { name:"Saturn", cost:125000000000000000000, muscles:550000000 },
+  { name:"Jupiter", cost:199000000000000000000, muscles:718000000 },
+  { name:"Super Saturn", cost:3700000000000000000000, muscles:1770000000 },
+  { name:"Sedna Bar", cost:10190000000000000000000, muscles:4150000000 },
+  { name:"Sun", cost:26800000000000000000000, muscles:9990000000 },
+  { name:"Mini Galaxy", cost:1420000000000000000000000, muscles:23890000000 },
+  { name:"Earth Bar", cost:3710000000000000000000000, muscles:57000000000 },
+  { name:"Black Hole", cost:9550000000000000000000000, muscles:139000000000 },
+  { name:"Four Dimensions", cost:626000000000000000000000000, muscles:529000000000 },
+  { name:"Sun Bar", cost:1590000000000000000000000, muscles:790000000000 },
+  { name:"Holy Star", cost:4049000000000000000000000, muscles:1889000000000 },
+  { name:"Meteoroids Ring", cost:311000000000000000000000000, muscles:4550000000000 },
+  { name:"Meteor Bar", cost:798900000000000000000000000, muscles:11000000000000 },
+  { name:"Water Sphere", cost:2020000000000000000000000000, muscles:26200000000000 }
+];
+  
+
+const stageSelect=document.getElementById("stageSelect")
+stages.forEach(s=>{
+  const o=document.createElement("option")
+  o.value=s.n
+  o.textContent=`Stage ${s.n} — x${s.m}`
+  stageSelect.appendChild(o)
+})
+
+function calculate(){
+  const stage=stages[stageSelect.value-1]
+  const base=Number(baseGain.value)||0
+  const cpsv=Number(cps.value)||0
+  const weight=weights.find(w=>w.name.toLowerCase().includes(weightSearch.value.toLowerCase()))
+  if(!weight)return resultBox.textContent="Weight not found."
+
+  let gain=base*stage.m
+  if(gpMuscle.checked)gain*=2
+  if(fast.checked)gain*=1.5
+
+  const perSecond=gain*cpsv
+  const need=weight.next
+  const seconds=need/perSecond
+
+  resultBox.innerHTML=`
+Stage: x${stage.m}<br>
+Current weight: ${weight.name}<br>
+Next weight cost: ${need.toLocaleString()} muscles<br>
+Muscles per second: ${perSecond.toLocaleString()}<br>
+Time needed: ${(seconds/60).toFixed(2)} minutes
+`
+}
+</script>
+
+</body>
+</html>
