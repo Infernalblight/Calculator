@@ -63,11 +63,15 @@ async function loadData() {
 function populateSelects() {
   const wSelect = document.getElementById('weightSelect');
   wSelect.innerHTML = '';
-  weights.forEach(w => {
-    let o = document.createElement('option');
-    o.value = w.name;
-    o.text = `${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${formatNum(w.gain)})`;
-    wSelect.appendChild(o);
+  const stagesSet = new Set(weights.map(w => w.stage));
+  stagesSet.forEach(stg => {
+    const stageWeights = weights.filter(w => w.stage === stg);
+    stageWeights.forEach(w => {
+      let o = document.createElement('option');
+      o.value = w.name;
+      o.text = `${w.name} (Cost: ${formatNum(w.cost)}, Gain: ${formatNum(w.gain)}) [Stage ${stg}]`;
+      wSelect.appendChild(o);
+    });
   });
   const sSelect = document.getElementById('stageSelect');
   sSelect.innerHTML = '';
@@ -123,15 +127,21 @@ function calculate() {
   const stage = stages.find(s => s.n === stageNum);
   if (!weight || !stage) return;
 
-  const gainStr = stage.gain;
+  const weightObj = weights.find(w => w.name === weightName);
+  if (!weightObj) return;
 
-  let musclesPerLift = weight.gain;
+  const stageWeights = weights.filter(w => w.stage === stage.num);
+  const stageWeightObj = stageWeights.find(w => w.name === weightName);
+  if (!stageWeightObj) return;
+
+  const gainStr = weightObj.gain;
+
+  let musclesPerLift = weightObj.gain;
   if (doubleMuscles) musclesPerLift *= 2;
 
-  let musclesPerSec = musclesPerLift * stage.speed;
+  let musclesPerSec = musclesPerLift * stage.m;
   if (faster) musclesPerSec *= 2;
 
-  const stageWeights = weights.filter(w => w.stage === weight.stage);
   const nextWeight = stageWeights.find(w => w.cost > ownedCoins);
   const timeToNextWeight = nextWeight ? (nextWeight.cost - ownedCoins) / musclesPerSec : Infinity;
 
@@ -146,7 +156,7 @@ function calculate() {
 
   document.getElementById('result').innerHTML = `
 <b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
-<b>Weight:</b> ${weight.name}<br>
+<b>Weight:</b> ${weightName}<br>
 <b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
 <b>Gain per Lift:</b> ${gainStr}<br>
 <b>Muscles/sec:</b> ${formatNum(musclesPerSec)}<br>
