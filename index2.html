@@ -3,256 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stage & Weight Calculator</title>
+<title>Lifting Simulator Calculator</title>
 <style>
-:root{
-  --yellow1:#f7c400;
-  --yellow2:#e0a800;
-  --panel:#b88900;
-  --panel2:#d6a600;
-  --slot:#ffd84a;
-  --green:#00e676;
-  --green-dark:#00b85c;
-  --blue:#4fc3ff;
-  --shadow:rgba(0,0,0,.35);
-}
-
-*{box-sizing:border-box;font-family:"Trebuchet MS",Arial,sans-serif}
-
-body{
-  margin:0;
-  min-height:100vh;
-  background:radial-gradient(circle at top,#3cff85,#00b85c 60%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-.main{
-  width:1400px;
-  max-width:96vw;
-  background:linear-gradient(180deg,var(--yellow1),var(--yellow2));
-  border-radius:28px;
-  padding:18px;
-  box-shadow:0 30px 90px var(--shadow);
-}
-
-.topbar{
-  background:linear-gradient(180deg,#ffe681,#ffd33d);
-  border-radius:18px;
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 6px 0 rgba(0,0,0,.25);
-}
-
-.title{
-  font-size:34px;
-  font-weight:900;
-  color:#3b66ff;
-  text-shadow:0 2px 0 rgba(0,0,0,.25);
-}
-
-.panel{
-  margin-top:14px;
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border-radius:22px;
-  padding:16px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  box-shadow:inset 0 -6px 0 rgba(0,0,0,.18);
-}
-
-.card{
-  background:linear-gradient(180deg,#ffd84a,#e6b800);
-  border-radius:20px;
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  box-shadow:0 10px 30px var(--shadow), inset 0 -5px 0 rgba(0,0,0,.2);
-}
-
-.card-title{
-  background:linear-gradient(180deg,#fff0a6,#ffd33d);
-  border-radius:14px;
-  padding:8px;
-  text-align:center;
-  font-size:22px;
-  font-weight:900;
-  color:#3b66ff;
-  text-shadow:0 2px 0 rgba(0,0,0,.25);
-}
-
-label{
-  font-weight:900;
-  color:white;
-  text-shadow:0 1px 0 rgba(0,0,0,.25);
-  font-size:14px;
-}
-
-input,select{
-  width:100%;
-  border:none;
-  border-radius:14px;
-  padding:12px;
-  background:#ffe88a;
-  font-weight:900;
-  font-size:15px;
-  outline:none;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
-}
-
-.options{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.option{
-  flex:1;
-  background:linear-gradient(180deg,#fff0a6,#ffd33d);
-  border-radius:12px;
-  padding:8px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-weight:900;
-  color:#2b2b2b;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
-}
-
-button{
-  margin-top:6px;
-  border:none;
-  border-radius:16px;
-  padding:12px;
-  font-size:22px;
-  font-weight:900;
-  color:white;
-  background:linear-gradient(180deg,var(--green),var(--green-dark));
-  box-shadow:0 6px 0 rgba(0,0,0,.3);
-  cursor:pointer;
-}
-
-.results{
-  background:linear-gradient(180deg,#fff0a6,#ffd33d);
-  border-radius:14px;
-  padding:10px;
-  font-weight:900;
-  color:#2b2b2b;
-  line-height:1.6;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
-}
+  body{font-family:Arial,sans-serif;background:#eef2f7;margin:0;padding:20px;display:flex;justify-content:center;}
+  .container{max-width:900px;width:100%;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:20px;}
+  h2{text-align:center;margin-bottom:20px;}
+  .row{margin-bottom:12px;}
+  label{font-weight:700;display:block;margin-bottom:4px;}
+  select,input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:15px;}
+  .options{display:flex;gap:10px;margin-top:10px;}
+  .options label{display:flex;align-items:center;font-weight:700;}
+  button{margin-top:12px;padding:10px 18px;font-size:18px;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer;}
+  .results{margin-top:18px;padding:12px;background:#f8f9fa;border-radius:6px;border:1px solid #ccc;font-size:16px;}
 </style>
 </head>
 <body>
 
-<div class="main">
-  <div class="topbar">
-    <div class="title">🏋 Stage & Weight Calculator 🏋</div>
+<div class="container">
+  <h2>🏋 Lifting Simulator Calculator</h2>
+
+  <div class="row">
+    <label>Select Stage</label>
+    <select id="stageSelect"></select>
   </div>
 
-  <div class="panel">
-
-    <div class="card">
-      <div class="card-title">Stage & Weight</div>
-
-      <label>Select stage</label>
-      <select id="stageSelect"></select>
-
-      <label>Search weight</label>
-      <input id="weightSearch" placeholder="Type your weight name...">
-
-      <div class="options">
-        <label class="option"><input id="gpMuscle" type="checkbox"> 2× Muscles</label>
-        <label class="option"><input id="gpCoins" type="checkbox"> 2× Coins</label>
-        <label class="option"><input id="fast" type="checkbox"> Faster Lifter</label>
-      </div>
-
-      <button onclick="calculate()">Calculate</button>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Next Weight Result</div>
-      <div class="results" id="resultBox">Fill inputs and press Calculate.</div>
-    </div>
-
+  <div class="row">
+    <label>Search Weight</label>
+    <input type="text" id="weightSearch" placeholder="Type weight name...">
   </div>
+
+  <div class="options">
+    <label><input type="checkbox" id="gpMuscle"> 2× Muscles</label>
+    <label><input type="checkbox" id="gpCoins"> 2× Coins</label>
+    <label><input type="checkbox" id="fast"> Faster Lifter</label>
+  </div>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="results" id="resultBox">Fill inputs and press Calculate.</div>
 </div>
 
 <script>
+const STAGES_URL = "https://liftingsimulatorcalculator.netlify.app/stages.json";
+const WEIGHTS_URL = "https://liftingsimulatorcalculator.netlify.app/weights.json";
+
 let stages = [];
 let weights = [];
 
-async function loadData() {
-  try {
-    const stagesRes = await fetch("/stages.json");
-    const weightsRes = await fetch("/weights.json");
-    stages = await stagesRes.json();
-    weights = await weightsRes.json();
-    populateStages();
-  } catch(e) {
-    console.error("Error loading JSON:", e);
-    document.getElementById("resultBox").textContent = "Failed to load JSON data.";
-  }
+async function loadJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to load " + url);
+  return await res.json();
+}
+
+function formatNum(n) {
+  if (n >= 1e12) return (n/1e12).toFixed(2) + "T";
+  if (n >= 1e9) return (n/1e9).toFixed(2) + "B";
+  if (n >= 1e6) return (n/1e6).toFixed(2) + "M";
+  if (n >= 1e3) return (n/1e3).toFixed(2) + "K";
+  return n.toLocaleString();
 }
 
 function populateStages() {
-  const stageSelect = document.getElementById("stageSelect");
-  stages.forEach(s=>{
-    const o = document.createElement("option");
-    o.value = s.n;
-    o.textContent = `Stage ${s.n} — x${s.m}`;
-    stageSelect.appendChild(o);
+  const sel = document.getElementById("stageSelect");
+  sel.innerHTML = "";
+  stages.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.n;
+    opt.textContent = `Stage ${s.n} (x${s.m})`;
+    sel.appendChild(opt);
   });
 }
 
-function parseCost(cost) {
-  if(typeof cost === "number") return cost;
-  const suffixes = {K:1e3,M:1e6,B:1e9,T:1e12,Qa:1e15,Qi:1e18,Sx:1e21,Sp:1e24,Oc:1e27,No:1e30,Dc:1e33,Ud:1e36,Dd:1e39,Td:1e42,Qad:1e45,Qid:1e48,Sxd:1e51,Spd:1e54,Ocd:1e57,Nod:1e60,Vg:1e63,Uvg:1e66,Tvg:1e69,Sxvg:1e72,Novg:1e75,Ttg:1e78};
-  const match = cost.match(/^([\d.]+)([a-zA-Z]+)$/);
-  if(!match) return Number(cost);
-  const [,num,suf] = match;
-  return parseFloat(num) * (suffixes[suf] || 1);
-}
-
 function calculate() {
-  const stageIndex = Number(document.getElementById("stageSelect").value);
-  const stage = stages.find(s=>s.n===stageIndex);
-  const weightName = document.getElementById("weightSearch").value.toLowerCase();
+  const stageN = Number(document.getElementById("stageSelect").value);
+  const stage = stages.find(s => s.n === stageN);
+  const search = document.getElementById("weightSearch").value.toLowerCase();
   const gpMuscle = document.getElementById("gpMuscle").checked;
   const gpCoins = document.getElementById("gpCoins").checked;
   const fast = document.getElementById("fast").checked;
   const resultBox = document.getElementById("resultBox");
 
-  const weight = weights.find(w=>w.stage===stage.n && w.name.toLowerCase().includes(weightName));
-  if(!weight) return resultBox.textContent = "Weight not found in this stage.";
+  const weight = weights.find(w => w.stage === stage.n && w.name.toLowerCase().includes(search));
+  if (!weight) {
+    resultBox.textContent = "Weight not found for this stage.";
+    return;
+  }
 
-  let gain = weight.gain * stage.m;
-  if(gpMuscle) gain *= 2;
+  let baseGain = weight.gain * stage.m;
+  if (gpMuscle) baseGain *= 2;
 
   let cps = 1;
-  if(fast) cps *= 1.866;
+  if (fast) cps *= 1.866;
 
-  const musclesPerSecond = gain * cps;
-
-  const costNum = parseCost(weight.cost);
-  const seconds = costNum / musclesPerSecond;
+  const musclesPerSec = baseGain * cps;
+  const cost = weight.cost;
+  const timeSec = cost / musclesPerSec;
 
   resultBox.innerHTML = `
-Stage multiplier: x${stage.m}<br>
-Weight: ${weight.name}<br>
-Weight cost: ${weight.cost}<br>
-Muscles per second: ${musclesPerSecond.toLocaleString()}<br>
-Time to reach: ${(seconds/60).toFixed(2)} minutes
+Stage Multiplier: x${stage.m}<br>
+Weight: <strong>${weight.name}</strong><br>
+Weight Cost: <strong>${formatNum(cost)}</strong><br>
+Gain per Lift: <strong>${formatNum(weight.gain)}</strong><br>
+Muscles/sec: <strong>${formatNum(musclesPerSec)}</strong><br>
+Time to reach: <strong>${(timeSec/60).toFixed(2)} minutes</strong><br>
+2× Muscles: ${gpMuscle ? "Yes" : "No"}<br>
+Faster Lifter: ${fast ? "Yes" : "No"}<br>
+2× Coins Flag: ${gpCoins ? "Yes" : "No"} (not used in muscle calc)
   `;
 }
 
-loadData();
+(async function init() {
+  try {
+    stages = await loadJSON(STAGES_URL);
+    weights = await loadJSON(WEIGHTS_URL);
+    populateStages();
+  } catch (e) {
+    console.error(e);
+    document.getElementById("resultBox").textContent = "Error loading data.";
+  }
+})();
 </script>
 
 </body>
