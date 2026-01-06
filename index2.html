@@ -255,8 +255,8 @@ function populate(){
 }
 
 function calculate(){
-  const ownedCoins=parseNum(ownedCoins.value)
-  const ownedMuscles=parseNum(ownedMuscles.value)
+  const ownedCoinsVal=parseNum(document.getElementById("ownedCoins").value)
+  const ownedMusclesVal=parseNum(document.getElementById("ownedMuscles").value)
 
   const weight=weights.find(w=>w.name===weightSelect.value)
   const stage=stages.find(s=>s.n==stageSelect.value)
@@ -270,7 +270,7 @@ function calculate(){
   let musclesPerSecond=musclesPerLift*liftsPerSecond
   let coinsPerSecond=doubleCoins.checked?musclesPerSecond*2:musclesPerSecond
 
-  let effectiveCoins=ownedCoins+(doubleCoins.checked?ownedMuscles*2:ownedMuscles)
+  let effectiveCoins=ownedCoinsVal+(doubleCoins.checked?ownedMusclesVal*2:ownedMusclesVal)
 
   const nextWeight=weights.find(w=>parseNum(w.cost)>effectiveCoins)
   const nextStage=stages.find(s=>s.n>stage.n)
@@ -288,14 +288,14 @@ Muscles per second: <span class="value">${formatNum(musclesPerSecond)}</span><br
 Coins per second: <span class="value">${formatNum(coinsPerSecond)}</span><br>
 Time to next weight: <span class="value">${humanTime(timeToWeight)}</span><br>
 Time to next stage: <span class="value">${humanTime(timeToStage)}</span><br><br>
-Already have muscles: <span class="value">${formatNum(ownedMuscles)}</span><br>
-Already have coins: <span class="value">${formatNum(ownedCoins)}</span><br><br>
+Already have muscles: <span class="value">${formatNum(ownedMusclesVal)}</span><br>
+Already have coins: <span class="value">${formatNum(ownedCoinsVal)}</span><br><br>
 Stage multiplier: <span class="value">x${stage.gainMultiplier}</span><br>
 Lifts/sec: <span class="value">${liftsPerSecond.toFixed(3)}</span>
 `
 }
 
-calculateBtn.onclick=calculate
+document.getElementById("calculateBtn").onclick=calculate
 loadData()
 </script>
 
