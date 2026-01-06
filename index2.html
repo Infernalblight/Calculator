@@ -74,7 +74,7 @@ function populateSelects() {
   stages.forEach(s => {
     let o = document.createElement('option');
     o.value = s.n;
-    o.text = `Stage ${s.n} x${formatNum(s.m)}`;
+    o.text = `Stage ${s.n} (x${formatNum(s.m)})`;
     sSelect.appendChild(o);
   });
 }
@@ -123,6 +123,8 @@ function calculate() {
   const stage = stages.find(s => s.n === stageNum);
   if (!weight || !stage) return;
 
+  const gainStr = stage.gain;
+
   let musclesPerLift = weight.gain;
   if (doubleMuscles) musclesPerLift *= 2;
 
@@ -142,16 +144,18 @@ function calculate() {
   }
   const timeToNextStage = totalNextStageCost / musclesPerSec;
 
-  document.getElementById('result').innerHTML = `<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
+  document.getElementById('result').innerHTML = `
+<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
 <b>Weight:</b> ${weight.name}<br>
 <b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
-<b>Gain per Lift:</b> ${formatNum(weight.gain)}<br>
+<b>Gain per Lift:</b> ${gainStr}<br>
 <b>Muscles/sec:</b> ${formatNum(musclesPerSec)}<br>
 <b>Time to next Weight:</b> ${humanTime(timeToNextWeight)}<br>
 <b>Time to next Stage:</b> ${humanTime(timeToNextStage)}<br>
 <b>2× Muscles:</b> ${doubleMuscles ? "Yes" : "No"}<br>
 <b>Faster Lifter:</b> ${faster ? "Yes" : "No"}<br>
-<b>2× Coins Flag:</b> ${doubleCoins ? "Yes" : "No"} (not used in muscle calc)`;
+<b>2× Coins Flag:</b> ${doubleCoins ? "Yes" : "No"} (not used in muscle calc)
+`;
 }
 
 document.getElementById('calculateBtn').addEventListener('click', calculate);
