@@ -33,18 +33,15 @@ const stagesURL = 'https://liftingsimulatorcalculator.netlify.app/stages.json';
 let weights = [], stages = [];
 const suffixes = [
   ["M",6],["B",9],["T",12],["Qa",15],["Qi",18],["Sx",21],["Sp",24],["Oc",27],["No",30],["Dc",33],
-  ["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],
-  ["Vg",63],["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],
-  ["Novg",90],["Tg",93],["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],
-  ["Sptg",114],["Octg",117],["Notg",120],["Ag",123],["Uag",126],["Dag",129],["Tag",132],["Qaag",135],
-  ["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],["Dcag",153],["Udag",156],
-  ["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],
-  ["Qiqag",180],["Sxqag",183],["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],
-  ["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],["Dqig",213],["Tqig",216],["QaQig",219],
-  ["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],["Udqig",240],
-  ["Ddqig",243],["Tdqig",246],["Sxg",249],["Usxg",252],["Dxsxg",255],["Tsxg",258],["Qasxg",261],
-  ["Qisxg",264],["Sxsxg",267],["Spsxg",270],["Ocsxg",273],["Nosxg",276],["Dcsxg",279],["Udsxg",282],
-  ["Ddsxg",285],["Tdsxg",288],["Spg",291],["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
+  ["Ud",36],["Dd",39],["Td",42],["Qad",45],["Qid",48],["Sxd",51],["Spd",54],["Ocd",57],["Nod",60],["Vg",63],
+  ["Uvg",66],["Dvg",69],["Tvg",72],["Qavg",75],["Qivg",78],["Sxvg",81],["Spvg",84],["Ocvg",87],["Novg",90],["Tg",93],
+  ["Utg",96],["Dtg",99],["Ttg",102],["Qatg",105],["Qitg",108],["Sxtg",111],["Sptg",114],["Octg",117],["Notg",120],["Ag",123],
+  ["Uag",126],["Dag",129],["Tag",132],["Qaag",135],["Qiag",138],["Sxag",141],["Spag",144],["Ocag",147],["Noag",150],["Dcag",153],
+  ["Udag",156],["Ddag",159],["Tdag",162],["Qaag",165],["Uqag",168],["Dqag",171],["Tqag",174],["Qaqag",177],["Qiqag",180],["Sxqag",183],
+  ["Spqag",186],["Ocqag",189],["Noqag",192],["Dcqag",195],["Udqag",198],["Ddqag",201],["Tdqag",204],["Qig",207],["Uqig",210],["Dqig",213],
+  ["Tqig",216],["QaQig",219],["Qiqig",222],["Sxqig",225],["Spqig",228],["Ocqig",231],["Noqig",234],["Dcqig",237],["Udqig",240],["Ddqig",243],
+  ["Tdqig",246],["Sxg",249],["Usxg",252],["Dxsxg",255],["Tsxg",258],["Qasxg",261],["Qisxg",264],["Sxsxg",267],["Spsxg",270],["Ocsxg",273],
+  ["Nosxg",276],["Dcsxg",279],["Udsxg",282],["Ddsxg",285],["Tdsxg",288],["Spg",291],["Uspg",294],["Dspg",297],["Tspg",300],["Qaspg",303],["Qispg",306]
 ];
 
 async function loadData() {
@@ -54,6 +51,10 @@ async function loadData() {
     if (!weightsResponse.ok || !stagesResponse.ok) throw new Error('Network response was not ok');
     weights = await weightsResponse.json();
     stages = await stagesResponse.json();
+
+    stages.forEach(stage => {
+      stage.gainMultiplier = parseFloat(stage.gain.replace('x', ''));
+    });
 
     populateSelects();
   } catch (error) {
@@ -80,8 +81,8 @@ function populateSelects() {
   sSelect.innerHTML = '';
   stages.forEach(s => {
     let o = document.createElement('option');
-    o.value = s.n; // Make sure value is the stage number
-    o.text = `Stage ${s.n} (x${formatNum(s.m)})`;
+    o.value = s.n;
+    o.text = `Stage ${s.n} (x${formatNum(s.gainMultiplier)})`;
     sSelect.appendChild(o);
   });
 }
@@ -142,9 +143,8 @@ function calculate() {
 
   const gainStr = weight.gain;
 
-  let musclesPerLift = weight.gain;
+  let musclesPerLift = stage.gainMultiplier;
   if (doubleMuscles) musclesPerLift *= 2;
-
   let musclesPerSec = musclesPerLift * stage.m;
   if (faster) musclesPerSec *= 2;
 
@@ -160,7 +160,7 @@ function calculate() {
   const timeToNextStage = totalNextStageCost / musclesPerSec;
 
   document.getElementById('result').innerHTML = `
-<b>Stage Multiplier:</b> x${formatNum(stage.m)}<br>
+<b>Stage Multiplier:</b> x${formatNum(stage.gainMultiplier)}<br>
 <b>Weight:</b> ${weightName}<br>
 <b>Weight Cost:</b> ${formatNum(weight.cost)}<br>
 <b>Gain per Lift:</b> ${gainStr}<br>
