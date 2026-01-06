@@ -82,8 +82,9 @@ function populateSelects() {
   const wSelect = document.getElementById('weightSelect');
   wSelect.innerHTML = '';
 
-  const stagesSet = new Set(weights.map(w => w.stage));
-  stagesSet.forEach(stg => {
+  // Group weights by stage for easy selection
+  const stageSet = new Set(weights.map(w => w.stage));
+  stageSet.forEach(stg => {
     const stageWeights = weights.filter(w => w.stage === stg);
     stageWeights.forEach(w => {
       let o = document.createElement('option');
@@ -97,7 +98,7 @@ function populateSelects() {
   sSelect.innerHTML = '';
   stages.forEach(s => {
     let o = document.createElement('option');
-    o.value = s.n;
+    o.value = s.n; // stage number as number
     o.text = `Stage ${s.n} (x${formatNum(s.gainMultiplier)})`;
     sSelect.appendChild(o);
   });
