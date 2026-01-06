@@ -2,81 +2,181 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Muscle Calculators</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiftSim Calculators</title>
+
 <style>
-*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+:root{
+  --yellow1:#f7c400;
+  --yellow2:#e0a800;
+  --panel:#b88900;
+  --panel2:#d6a600;
+  --slot:#ffd84a;
+  --slot-dark:#e6b800;
+  --green:#00e676;
+  --green-dark:#00b85c;
+  --blue:#4fc3ff;
+  --text:#ffffff;
+  --shadow:rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box;font-family:"Trebuchet MS",Arial,sans-serif}
+
 body{
   margin:0;
   min-height:100vh;
-  background:radial-gradient(circle at top,#35ff7a,#00c853 60%);
+  background:radial-gradient(circle at top,#3cff85,#00b85c 60%);
   display:flex;
   align-items:center;
   justify-content:center;
+  overflow:hidden;
 }
-.container{
-  width:1200px;
+
+.ui-scale{
+  transform-origin:center;
+}
+
+.main{
+  width:1500px;
   max-width:96vw;
-  background:#f2c200;
-  border-radius:26px;
-  padding:16px;
-  box-shadow:0 30px 90px rgba(0,0,0,.4);
+  background:linear-gradient(180deg,var(--yellow1),var(--yellow2));
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 30px 90px var(--shadow);
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:14px;
+}
+
+.sidebar{
+  background:linear-gradient(180deg,#ffdf66,#e6b800);
+  border-radius:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:12px 8px;
+  gap:12px;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.2);
+}
+
+.side-btn{
+  width:64px;
+  height:64px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#fff3b0,#ffd000);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:900;
+  color:#3b66ff;
+  box-shadow:0 6px 0 rgba(0,0,0,.25);
+}
+
+.content{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border-radius:22px;
+  padding:14px;
+  display:grid;
+  grid-template-rows:auto 1fr;
+  gap:12px;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.18);
+}
+
+.topbar{
+  background:linear-gradient(180deg,#ffe681,#ffd33d);
+  border-radius:18px;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 6px 0 rgba(0,0,0,.25);
+}
+
+.back{
+  background:linear-gradient(180deg,#6fd3ff,#2fb2ff);
+  padding:6px 14px;
+  border-radius:14px;
+  font-weight:900;
+  color:white;
+  box-shadow:0 4px 0 rgba(0,0,0,.25);
+}
+
+.title{
+  flex:1;
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  color:#3b66ff;
+  letter-spacing:1px;
+  text-shadow:0 2px 0 rgba(0,0,0,.25);
+}
+
+.cards{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:14px;
 }
+
 .card{
-  background:#d9a900;
+  background:linear-gradient(180deg,#ffd84a,#e6b800);
   border-radius:20px;
   padding:14px;
-  box-shadow:inset 0 -6px 0 rgba(0,0,0,.18);
   display:flex;
   flex-direction:column;
   gap:10px;
+  box-shadow:0 10px 30px var(--shadow), inset 0 -5px 0 rgba(0,0,0,.2);
 }
-.header{
-  background:#ffd83a;
-  border-radius:16px;
-  padding:10px;
+
+.card-title{
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
+  border-radius:14px;
+  padding:8px;
+  text-align:center;
   font-size:22px;
   font-weight:900;
-  text-align:center;
   color:#3b66ff;
   text-shadow:0 2px 0 rgba(0,0,0,.25);
 }
+
 label{
   font-weight:800;
   color:white;
   text-shadow:0 1px 0 rgba(0,0,0,.25);
   font-size:14px;
 }
+
 input,select{
   width:100%;
   border:none;
   border-radius:14px;
   padding:12px;
   background:#ffe88a;
-  font-weight:800;
+  font-weight:900;
   font-size:15px;
   outline:none;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.2);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
+
 .options{
   display:flex;
-  gap:10px;
+  gap:8px;
   flex-wrap:wrap;
 }
+
 .option{
   flex:1;
-  background:#ffd83a;
-  border-radius:14px;
-  padding:8px 10px;
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
+  border-radius:12px;
+  padding:8px;
   display:flex;
   align-items:center;
-  gap:8px;
-  font-weight:800;
-  color:#2d2d2d;
+  gap:6px;
+  font-weight:900;
+  color:#2b2b2b;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
-.option input{width:auto}
+
 button{
   margin-top:6px;
   border:none;
@@ -85,98 +185,134 @@ button{
   font-size:22px;
   font-weight:900;
   color:white;
-  background:#00ff6a;
-  box-shadow:0 6px 0 rgba(0,0,0,.25);
+  background:linear-gradient(180deg,var(--green),var(--green-dark));
+  box-shadow:0 6px 0 rgba(0,0,0,.3);
   cursor:pointer;
 }
+
 .results{
-  background:#ffd83a;
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
   border-radius:14px;
   padding:10px;
-  font-weight:800;
-  color:#2d2d2d;
+  font-weight:900;
+  color:#2b2b2b;
   line-height:1.6;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);
 }
+
 table{
   width:100%;
   border-collapse:collapse;
-  background:#ffd83a;
+  background:linear-gradient(180deg,#fff0a6,#ffd33d);
   border-radius:14px;
   overflow:hidden;
-  font-weight:800;
-  color:#2d2d2d;
+  font-weight:900;
+  color:#2b2b2b;
 }
+
 th,td{
   padding:6px 8px;
-  border-bottom:2px solid #e5b900;
+  border-bottom:2px solid #e0b800;
   font-size:13px;
 }
+
 th{text-align:left}
 td{text-align:right}
-.value{color:#00a84a;font-weight:900}
+.value{color:#00a84a}
+
+@media (max-width:1100px){
+  .cards{grid-template-columns:1fr}
+  .main{grid-template-columns:70px 1fr}
+}
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="ui-scale" id="scaleRoot">
+<div class="main">
 
-<div class="card">
-  <div class="header">🏋 Muscle Timeline 🏋</div>
-  <label>Muscles per lift</label>
-  <input id="mpl">
-  <label>Muscles you already have</label>
-  <input id="musclesHave">
-  <label>Clicks per second</label>
-  <input id="cps1">
-  <div class="options">
-    <label class="option"><input id="fast1" type="checkbox">Fast Lifter</label>
+<div class="sidebar">
+  <div class="side-btn">1</div>
+  <div class="side-btn">2</div>
+  <div class="side-btn">3</div>
+</div>
+
+<div class="content">
+  <div class="topbar">
+    <div class="back">Back</div>
+    <div class="title">🏋 Lifting Calculators 🏋</div>
   </div>
-  <button onclick="calcTimeline()">Equip</button>
-  <table id="timeline"></table>
-</div>
 
-<div class="card">
-  <div class="header">🪙 Coin Target 🪙</div>
-  <label>Coins needed</label>
-  <input id="coinsNeeded">
-  <label>Coins you have</label>
-  <input id="coinsHave">
-  <label>Muscles per lift</label>
-  <input id="mpl2">
-  <label>Muscles you already have</label>
-  <input id="musclesHave2">
-  <label>Clicks per second</label>
-  <input id="cps2">
-  <div class="options">
-    <label class="option"><input id="doubleCoins" type="checkbox">2× Coins</label>
-    <label class="option"><input id="fast2" type="checkbox">Fast Lifter</label>
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-title">Muscle Timeline</div>
+      <label>Muscles per lift</label>
+      <input id="mpl">
+      <label>Muscles you already have</label>
+      <input id="musclesHave">
+      <label>Clicks per second</label>
+      <input id="cps1">
+      <div class="options">
+        <label class="option"><input id="fast1" type="checkbox"> Fast Lifter</label>
+      </div>
+      <button onclick="calcTimeline()">Calculate</button>
+      <table id="timeline"></table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Coin Target</div>
+      <label>Coins needed</label>
+      <input id="coinsNeeded">
+      <label>Coins you have</label>
+      <input id="coinsHave">
+      <label>Muscles per lift</label>
+      <input id="mpl2">
+      <label>Muscles you already have</label>
+      <input id="musclesHave2">
+      <label>Clicks per second</label>
+      <input id="cps2">
+      <div class="options">
+        <label class="option"><input id="doubleCoins" type="checkbox"> 2× Coins</label>
+        <label class="option"><input id="fast2" type="checkbox"> Fast Lifter</label>
+      </div>
+      <button onclick="calcCoins()">Calculate</button>
+      <div class="results" id="coinResults"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bloodline</div>
+      <label>Bloodline per minion</label>
+      <input id="bloodPerKill">
+      <label>Minions killed at once</label>
+      <select id="minionsAtOnce">
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+      <label>Kill time (seconds)</label>
+      <input id="killTime" value="10.2">
+      <label>Bloodline needed</label>
+      <input id="bloodNeeded">
+      <button onclick="calcBloodline()">Calculate</button>
+      <div class="results" id="bloodResults"></div>
+    </div>
+
   </div>
-  <button onclick="calcCoins()">Equip</button>
-  <div class="results" id="coinResults"></div>
 </div>
 
-<div class="card">
-  <div class="header">🩸 Bloodline 🩸</div>
-  <label>Bloodline per minion</label>
-  <input id="bloodPerKill">
-  <label>Minions killed at once</label>
-  <select id="minionsAtOnce">
-    <option value="1">1</option>
-    <option value="2">2</option>
-  </select>
-  <label>Kill time (seconds)</label>
-  <input id="killTime" value="10.2">
-  <label>Bloodline needed</label>
-  <input id="bloodNeeded">
-  <button onclick="calcBloodline()">Equip</button>
-  <div class="results" id="bloodResults"></div>
 </div>
-
 </div>
 
 <script>
 const API_URL="https://liverpool-silk-chapter-wells.trycloudflare.com"
+
+function autoScale(){
+  const baseW=1500
+  const scale=Math.min(window.innerWidth/baseW,1)
+  document.getElementById("scaleRoot").style.transform=`scale(${scale})`
+}
+window.addEventListener("resize",autoScale)
+autoScale()
 
 function formatVal(v){
   const u=["","K","M","B","T","QA","QI","SX","SP","OC","NO","DC"]
@@ -211,5 +347,6 @@ async function calcBloodline(){
   bloodResults.innerHTML=`Bloodline per minute: <span class="value">${formatVal(d.perMinute)}</span><br>Exact time: <span class="value">${d.exact}</span><br>Days: <span class="value">${d.days.toFixed(2)}</span><br>Hours: <span class="value">${d.hours.toFixed(2)}</span><br>Minutes: <span class="value">${d.minutes.toFixed(2)}</span><br>Seconds: <span class="value">${d.seconds.toFixed(2)}</span>`
 }
 </script>
+
 </body>
 </html>
