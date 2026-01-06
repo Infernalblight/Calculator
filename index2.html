@@ -90,8 +90,8 @@ label{font-size:14px;opacity:.85}
 </div>
 
 <script>
-const weightsURL = "https://liftingsimulatorcalculator.netlify.app/weights.json"
-const stagesURL  = "https://liftingsimulatorcalculator.netlify.app/stages.json"
+const weightsURL = "weights.json"
+const stagesURL  = "stages.json"
 
 let weights=[], stages=[]
 
@@ -120,7 +120,7 @@ function populate(){
   stageSelect.innerHTML=""
 
   stages.sort((a,b)=>a.n-b.n)
-  weights.sort((a,b)=>a.cost-b.cost)
+  weights.sort((a,b)=>parseNum(a.cost)-parseNum(b.cost))
 
   for(const st of stages){
     const o=document.createElement("option")
@@ -138,7 +138,8 @@ function populate(){
 }
 
 function parseNum(str){
-  if(!str)return 0
+  if(str==null)return 0
+  if(typeof str==="number")return str
   str=str.replace(/,/g,"").trim()
   for(const [s,p] of suffixes){
     if(str.toUpperCase().endsWith(s.toUpperCase()))
@@ -148,6 +149,7 @@ function parseNum(str){
 }
 
 function formatNum(n){
+  n=parseNum(n)
   if(!isFinite(n))return "∞"
   for(let i=suffixes.length-1;i>=0;i--){
     if(n>=10**suffixes[i][1])
@@ -177,7 +179,7 @@ function calculate(){
   const ownedCoins=parseNum(ownedCoinsInput.value)
 
   let gain=parseNum(weight.gain)
-  gain*=stage.gainMultiplier
+  gain*=parseNum(stage.gainMultiplier)
 
   if(doubleMuscles.checked)gain*=2
 
@@ -187,11 +189,11 @@ function calculate(){
   let coinsPerSecond=perSecond
   if(doubleCoins.checked)coinsPerSecond*=2
 
-  const nextWeight=weights.find(w=>w.cost>ownedCoins)
+  const nextWeight=weights.find(w=>parseNum(w.cost)>ownedCoins)
   const nextStage=stages.find(s=>s.n>stage.n)
 
-  const timeToWeight=nextWeight?(nextWeight.cost-ownedCoins)/coinsPerSecond:Infinity
-  const timeToStage=nextStage?((weights.filter(w=>w.stage==nextStage.n)[0]?.cost||Infinity)-ownedCoins)/coinsPerSecond:Infinity
+  const timeToWeight=nextWeight?(parseNum(nextWeight.cost)-ownedCoins)/coinsPerSecond:Infinity
+  const timeToStage=nextStage?((parseNum(weights.filter(w=>w.stage==nextStage.n)[0]?.cost)||Infinity)-ownedCoins)/coinsPerSecond:Infinity
 
   result.innerHTML=`
 <b>Muscles per lift:</b> ${formatNum(gain)}<br>
