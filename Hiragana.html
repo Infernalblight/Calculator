@@ -20,12 +20,35 @@ background:#12172a;
 padding:24px;
 border-radius:20px;
 box-shadow:0 20px 60px rgba(0,0,0,.5);
-width:320px;
+width:340px;
 text-align:center
+}
+.top{
+display:flex;
+gap:8px;
+margin-bottom:12px
+}
+.top button{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+font-weight:700;
+background:#1b2140;
+color:white
+}
+.top button.active{
+background:#7c9cff;
+color:#0b0f1a
 }
 .char{
 font-size:96px;
-margin:20px 0
+margin:16px 0
+}
+.meaning{
+font-size:22px;
+min-height:28px;
+opacity:.9
 }
 input{
 width:100%;
@@ -34,9 +57,10 @@ border-radius:10px;
 border:none;
 outline:none;
 font-size:18px;
-text-align:center
+text-align:center;
+margin-top:10px
 }
-button{
+button.main{
 margin-top:12px;
 padding:12px;
 width:100%;
@@ -47,20 +71,49 @@ background:#7c9cff;
 color:#0b0f1a;
 font-weight:700
 }
+.row{
+display:flex;
+gap:8px;
+margin-top:10px
+}
+.row button{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+font-size:14px;
+background:#1b2140;
+color:white
+}
 .result{
-margin-top:12px;
+margin-top:10px;
 min-height:24px;
 font-size:18px
 }
 .correct{color:#5bffb0}
 .wrong{color:#ff6b6b}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <div class="app">
+<div class="top">
+<button id="quizBtn" class="active">Quiz</button>
+<button id="studyBtn">Study</button>
+</div>
+
 <div class="char" id="char">あ</div>
+<div class="meaning" id="meaning"></div>
+
 <input id="answer" placeholder="type romaji">
-<button id="submit">Submit</button>
+
+<button class="main" id="mainBtn">Submit</button>
+
+<div class="row" id="quizRow">
+<button id="hintBtn">Hint</button>
+<button id="showBtn">Show Answer</button>
+</div>
+
 <div class="result" id="result"></div>
 </div>
 
@@ -79,35 +132,89 @@ const hiragana = [
 ];
 
 let current = null;
+let mode = "quiz";
 
-function newChar(){
+const charEl = document.getElementById("char");
+const meaningEl = document.getElementById("meaning");
+const answerEl = document.getElementById("answer");
+const resultEl = document.getElementById("result");
+const mainBtn = document.getElementById("mainBtn");
+const quizRow = document.getElementById("quizRow");
+const quizBtn = document.getElementById("quizBtn");
+const studyBtn = document.getElementById("studyBtn");
+
+function randomChar(){
 current = hiragana[Math.floor(Math.random()*hiragana.length)];
-document.getElementById("char").textContent = current[0];
-document.getElementById("answer").value = "";
-document.getElementById("result").textContent = "";
-document.getElementById("answer").focus();
+charEl.textContent = current[0];
+meaningEl.textContent = "";
+answerEl.value = "";
+resultEl.textContent = "";
+answerEl.focus();
 }
 
-function submit(){
-const val = document.getElementById("answer").value.trim().toLowerCase();
-const res = document.getElementById("result");
+function submitQuiz(){
+const val = answerEl.value.trim().toLowerCase();
 if(val === current[1]){
-res.textContent = "Correct";
-res.className = "result correct";
-setTimeout(newChar,700);
+resultEl.textContent = "Correct";
+resultEl.className = "result correct";
+setTimeout(randomChar,700);
 }else{
-res.textContent = "Wrong ("+current[1]+")";
-res.className = "result wrong";
-setTimeout(newChar,900);
+resultEl.textContent = "Wrong ("+current[1]+")";
+resultEl.className = "result wrong";
+setTimeout(randomChar,900);
 }
 }
 
-document.getElementById("submit").addEventListener("click", submit);
-document.getElementById("answer").addEventListener("keydown", e=>{
-if(e.key==="Enter") submit();
+function showStudy(){
+current = hiragana[Math.floor(Math.random()*hiragana.length)];
+charEl.textContent = current[0];
+meaningEl.textContent = current[1];
+resultEl.textContent = "";
+}
+
+function setMode(m){
+mode = m;
+quizBtn.classList.remove("active");
+studyBtn.classList.remove("active");
+if(m==="quiz"){
+quizBtn.classList.add("active");
+answerEl.classList.remove("hidden");
+quizRow.classList.remove("hidden");
+mainBtn.textContent = "Submit";
+meaningEl.textContent = "";
+randomChar();
+}else{
+studyBtn.classList.add("active");
+answerEl.classList.add("hidden");
+quizRow.classList.add("hidden");
+mainBtn.textContent = "Next";
+showStudy();
+}
+}
+
+document.getElementById("hintBtn").onclick = ()=>{
+if(!current) return;
+meaningEl.textContent = current[1][0] + "...";
+};
+
+document.getElementById("showBtn").onclick = ()=>{
+if(!current) return;
+meaningEl.textContent = current[1];
+};
+
+mainBtn.onclick = ()=>{
+if(mode==="quiz") submitQuiz();
+else showStudy();
+};
+
+answerEl.addEventListener("keydown",e=>{
+if(e.key==="Enter" && mode==="quiz") submitQuiz();
 });
 
-newChar();
+quizBtn.onclick = ()=>setMode("quiz");
+studyBtn.onclick = ()=>setMode("study");
+
+randomChar();
 </script>
 </body>
 </html>
