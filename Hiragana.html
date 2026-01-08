@@ -20,13 +20,13 @@ background:#12172a;
 padding:24px;
 border-radius:20px;
 box-shadow:0 20px 60px rgba(0,0,0,.5);
-width:340px;
+width:360px;
 text-align:center
 }
 .top{
 display:flex;
 gap:8px;
-margin-bottom:12px
+margin-bottom:10px
 }
 .top button{
 flex:1;
@@ -41,16 +41,37 @@ color:white
 background:#7c9cff;
 color:#0b0f1a
 }
+.settings{
+display:flex;
+gap:8px;
+margin-bottom:12px
+}
+.settings input{
+flex:1;
+padding:10px;
+border-radius:10px;
+border:none;
+font-size:14px;
+text-align:center
+}
+.settings button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#1b2140;
+color:white;
+font-weight:700
+}
 .char{
 font-size:96px;
-margin:16px 0
+margin:14px 0
 }
 .meaning{
 font-size:22px;
 min-height:28px;
 opacity:.9
 }
-input{
+input.answer{
 width:100%;
 padding:12px;
 border-radius:10px;
@@ -102,10 +123,15 @@ font-size:18px
 <button id="studyBtn">Study</button>
 </div>
 
+<div class="settings">
+<input id="countInput" type="number" min="1" max="46" value="46">
+<button id="applyBtn">Apply</button>
+</div>
+
 <div class="char" id="char">あ</div>
 <div class="meaning" id="meaning"></div>
 
-<input id="answer" placeholder="type romaji">
+<input id="answer" class="answer" placeholder="type romaji">
 
 <button class="main" id="mainBtn">Submit</button>
 
@@ -118,7 +144,7 @@ font-size:18px
 </div>
 
 <script>
-const hiragana = [
+const allHiragana = [
 ["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"],
 ["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"],
 ["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"],
@@ -131,6 +157,7 @@ const hiragana = [
 ["わ","wa"],["を","wo"],["ん","n"]
 ];
 
+let pool = [...allHiragana];
 let current = null;
 let mode = "quiz";
 
@@ -142,9 +169,28 @@ const mainBtn = document.getElementById("mainBtn");
 const quizRow = document.getElementById("quizRow");
 const quizBtn = document.getElementById("quizBtn");
 const studyBtn = document.getElementById("studyBtn");
+const countInput = document.getElementById("countInput");
+const applyBtn = document.getElementById("applyBtn");
+
+function shuffle(arr){
+for(let i=arr.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+
+function rebuildPool(){
+let n = parseInt(countInput.value);
+if(isNaN(n) || n<1) n=1;
+if(n>allHiragana.length) n=allHiragana.length;
+pool = shuffle([...allHiragana]).slice(0,n);
+if(mode==="quiz") randomChar();
+else showStudy();
+}
 
 function randomChar(){
-current = hiragana[Math.floor(Math.random()*hiragana.length)];
+current = pool[Math.floor(Math.random()*pool.length)];
 charEl.textContent = current[0];
 meaningEl.textContent = "";
 answerEl.value = "";
@@ -166,7 +212,7 @@ setTimeout(randomChar,900);
 }
 
 function showStudy(){
-current = hiragana[Math.floor(Math.random()*hiragana.length)];
+current = pool[Math.floor(Math.random()*pool.length)];
 charEl.textContent = current[0];
 meaningEl.textContent = current[1];
 resultEl.textContent = "";
@@ -213,8 +259,9 @@ if(e.key==="Enter" && mode==="quiz") submitQuiz();
 
 quizBtn.onclick = ()=>setMode("quiz");
 studyBtn.onclick = ()=>setMode("study");
+applyBtn.onclick = rebuildPool;
 
-randomChar();
+rebuildPool();
 </script>
 </body>
 </html>
