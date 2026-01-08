@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hiragana Trainer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+margin:0;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#0b0f1a;
+color:white;
+font-family:system-ui,Arial,sans-serif
+}
+.app{
+background:#12172a;
+padding:24px;
+border-radius:20px;
+box-shadow:0 20px 60px rgba(0,0,0,.5);
+width:320px;
+text-align:center
+}
+.char{
+font-size:96px;
+margin:20px 0
+}
+input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+outline:none;
+font-size:18px;
+text-align:center
+}
+button{
+margin-top:12px;
+padding:12px;
+width:100%;
+border:none;
+border-radius:10px;
+font-size:16px;
+background:#7c9cff;
+color:#0b0f1a;
+font-weight:700
+}
+.result{
+margin-top:12px;
+min-height:24px;
+font-size:18px
+}
+.correct{color:#5bffb0}
+.wrong{color:#ff6b6b}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="char" id="char">あ</div>
+<input id="answer" placeholder="type romaji">
+<button id="submit">Submit</button>
+<div class="result" id="result"></div>
+</div>
+
+<script>
+const hiragana = [
+["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"],
+["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"],
+["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"],
+["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"],
+["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"],
+["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"],
+["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"],
+["や","ya"],["ゆ","yu"],["よ","yo"],
+["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"],
+["わ","wa"],["を","wo"],["ん","n"]
+];
+
+let current = null;
+
+function newChar(){
+current = hiragana[Math.floor(Math.random()*hiragana.length)];
+document.getElementById("char").textContent = current[0];
+document.getElementById("answer").value = "";
+document.getElementById("result").textContent = "";
+document.getElementById("answer").focus();
+}
+
+function submit(){
+const val = document.getElementById("answer").value.trim().toLowerCase();
+const res = document.getElementById("result");
+if(val === current[1]){
+res.textContent = "Correct";
+res.className = "result correct";
+setTimeout(newChar,700);
+}else{
+res.textContent = "Wrong ("+current[1]+")";
+res.className = "result wrong";
+setTimeout(newChar,900);
+}
+}
+
+document.getElementById("submit").addEventListener("click", submit);
+document.getElementById("answer").addEventListener("keydown", e=>{
+if(e.key==="Enter") submit();
+});
+
+newChar();
+</script>
+</body>
+</html>
