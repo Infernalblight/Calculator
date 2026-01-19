@@ -336,11 +336,19 @@ window.addEventListener("resize",autoScale)
 autoScale()
 
 function formatVal(v){
-  const u=["","K","M","B","T","QA","QI","SX","SP","OC","NO","DC"]
+  const u=[
+    "",
+    "K","M","B","T",
+    "QA","QI","SX","SP","OC","NO","DC",
+    "UD","DD","TD","QAD","QID","SXD","SPD","OCD","NOD",
+    "VG","UVG","DVG","TVG","QAVG","QIVG","SXVG","SPVG","OCVG","NOVG",
+    "TG","UTG","DTG","TTG","QATG","QITG","SXTG","SPTG","OCTG"
+  ]
   let i=0
   while(v>=1000&&i<u.length-1){v/=1000;i++}
   return v.toFixed(3)+" "+u[i]
 }
+
 
 function renderTimeline(perSec,have){
   timeline.innerHTML="<tr><th>Time</th><th>Total Muscles</th></tr>"
