@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quantum Tunneling Chance</title>
+<style>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+}
+#wrap {
+    text-align: center;
+    width: 90%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+#title {
+    font-size: 5vw;
+    margin-bottom: 2rem;
+}
+#number {
+    font-size: 1.4vw;
+    line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="title">chance of quantum tunneling 1 /</div>
+<div id="number"></div>
+</div>
+
+<script>
+document.getElementById("number").textContent = "1" + "0".repeat(1000)
+</script>
+</body>
+</html>
