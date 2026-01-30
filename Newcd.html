@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Print / Warn Output</title>
+<style>
+body {
+    background:#0f0f0f;
+    color:#eaeaea;
+    font-family:monospace;
+    margin:0;
+    padding:20px;
+}
+textarea {
+    width:100%;
+    height:200px;
+    background:#111;
+    color:#fff;
+    border:1px solid #333;
+    padding:10px;
+    resize:vertical;
+}
+button {
+    margin-top:10px;
+    padding:10px 16px;
+    background:#222;
+    color:#fff;
+    border:1px solid #444;
+    cursor:pointer;
+}
+#output {
+    margin-top:20px;
+    background:#000;
+    border:1px solid #333;
+    padding:10px;
+    min-height:150px;
+    white-space:pre-wrap;
+}
+.log { color:#eaeaea; }
+.warn { color:#ffcc00; }
+</style>
+</head>
+<body>
+
+<textarea id="code">
+x = 5
+y = 10
+print("hi", x)
+warn("value:", y)
+</textarea>
+
+<button onclick="run()">Run</button>
+
+<div id="output"></div>
+
+<script>
+function run() {
+    const output = document.getElementById("output");
+    output.innerHTML = "";
+    const vars = {};
+    const lines = document.getElementById("code").value.split("\n");
+
+    function write(text, cls) {
+        const div = document.createElement("div");
+        div.className = cls;
+        div.textContent = text;
+        output.appendChild(div);
+    }
+
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        if (line.includes("=") && !line.startsWith("print") && !line.startsWith("warn")) {
+            const parts = line.split("=");
+            vars[parts[0].trim()] = parts[1].trim();
+            continue;
+        }
+
+        if (line.startsWith("print") || line.startsWith("warn")) {
+            const isWarn = line.startsWith("warn");
+            const args = line.substring(line.indexOf("(")+1, line.lastIndexOf(")"))
+                .split(",")
+                .map(a => a.trim())
+                .map(a => {
+                    if (a.startsWith('"') && a.endsWith('"')) return a.slice(1,-1);
+                    if (vars[a] !== undefined) return vars[a];
+                    return a;
+                });
+            write(args.join(" "), isWarn ? "warn" : "log");
+        }
+    }
+}
+</script>
+
+</body>
+</html>
